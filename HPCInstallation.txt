@@ -4,8 +4,8 @@ to check cuda compiler version
 
 Install tensorflow on HPC using miniconda:
 - module load miniconda/2.7.15/gcc.7.2.0
-- module load cuda80/blas/8.0.61                 (should be compatible to nvcc version)
-- module load cuda80/toolkit/8.0.61              (should be compatible to nvcc version)
+- module load cuda10.1/blas/10.1.243                 (should be compatible to nvcc version)
+- module load cuda10.1/toolkit/10.1.243              (should be compatible to nvcc version)
 - conda create -n tf-gpu tensorflow-gpu
 - conda activate tf-gpu
 
@@ -13,9 +13,3 @@ Run with GPU support:
 - module load slurm
 - module load python/3.7.0/gcc.8.2.0
 - sbatch testTF2.sh
-
-Test tensorflow:
->>> import tensorflow as tf 
->>> hello = tf.constant("hello TensorFlow!") 
->>> sess=tf.Session() 
->>> print sess.run(hello)
