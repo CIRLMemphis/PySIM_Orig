@@ -35,20 +35,31 @@ class CNN:
 		model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',input_shape=(self.height,self.width,self.channels),padding='same'))
 		model.add(LeakyReLU(alpha=0.1))
 		model.add(MaxPooling2D((2, 2),padding='same'))
+
 		model.add(Conv2D(64, (3, 3), activation='linear',padding='same'))
 		model.add(LeakyReLU(alpha=0.1))
 		model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
+
 		model.add(Conv2D(128, (3, 3), activation='linear',padding='same'))
 		model.add(LeakyReLU(alpha=0.1))                  
 		model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
+
 		model.add(Conv2DTranspose(64, kernel_size = (3,3), padding='same'))
+		model.add(LeakyReLU(alpha=0.1))
 		model.add(UpSampling2D())
+
 		model.add(Conv2DTranspose(32, kernel_size = (3,3), padding='same'))
+		model.add(LeakyReLU(alpha=0.1))
 		model.add(UpSampling2D())
+
 		model.add(Conv2DTranspose(16, kernel_size = (3,3), padding='same'))
+		model.add(LeakyReLU(alpha=0.1))
 		model.add(UpSampling2D())
+
 		model.add(Conv2DTranspose(1, kernel_size = (3,3), padding='same'))
+		model.add(LeakyReLU(alpha=0.1))
 		model.add(UpSampling2D())
+		
 		self.model = model
 		print(model.summary())
 

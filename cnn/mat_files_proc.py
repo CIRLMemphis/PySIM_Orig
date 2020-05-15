@@ -6,9 +6,9 @@ from sklearn.model_selection import train_test_split
 
 class mat_files_proc:
 	def __init__(self):
-		self.inp_fname = '../../input/input/U2OSActin'
+		self.inp_fname = '../../input/U2OSActin'
 		self.out_fname = '../../output/output/outU2OSActin'
-		self.limit = 100
+		self.limit = 500 #How many image files we want to train
 		self.Nthe = 3
 		self.Nphi = 5
 
