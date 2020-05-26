@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 
 class mat_files_proc:
 	def __init__(self):
-		self.inp_fname = '../../input/U2OSActin'
-		self.out_fname = '../../output/output/outU2OSActin'
+		self.inp_fname = 'D:/NNData/NNData_0520/in/inFairSIM'
+		self.out_fname = 'D:/NNData/NNData_0520/out/outFairSIM'
 		self.limit = 500 #How many image files we want to train
 		self.Nthe = 3
 		self.Nphi = 5
@@ -20,11 +20,14 @@ class mat_files_proc:
 			ni = ''.join(['0']*ni) + str(i)
 			inp_file = self.inp_fname + ni + '.mat'
 			out_file = self.out_fname + ni + '.mat'
-			inp_img = loadmat(inp_file)['crop_g']
+			inp_img  = loadmat(inp_file)['crop_g']
+			inp_set  = []
+			for i in range(self.Nthe):
+				for j in range(self.Nphi):
+					inp_set.append(inp_img[:,:,0,i,j])
 			out_img = loadmat(out_file)['crop_g']
-			for j in range(self.Nthe):
-				inp_images.append(inp_img[:,:,0,j])
-				out_images.append(out_img)
+			out_images.append(out_img)
+			inp_images.append(np.transpose(inp_set, (1, 2, 0)))
 
 		
 		inp_images,out_images = np.array(inp_images),np.array(out_images)
