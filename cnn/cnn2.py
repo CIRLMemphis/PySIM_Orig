@@ -1,17 +1,14 @@
 import tensorflow as tf
 import keras
 from keras.models import Sequential,Input,Model
-from keras.layers import Dense, Dropout, Flatten,merge
+from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D,Conv2DTranspose,UpSampling2D
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
-#from mat_files_proc import mat_files_proc
+from mat_files_proc import mat_files_proc
 import numpy as np
 from keras.utils import to_categorical
-#from img_proc import img_proc
-import tensorlayer as tl
-from tensorlayer.layers import (Input, Conv2d, BatchNorm2d, Elementwise, SubpixelConv2d, Flatten, Dense)
-from tensorlayer.models import Model
+from img_proc import img_proc
 
 class PredictionCallback(tf.keras.callbacks.Callback):    
   def on_epoch_end(self, epoch, logs={}):
@@ -26,7 +23,7 @@ class PredictionCallback(tf.keras.callbacks.Callback):
   	ip.SaveImg(act_img,pred_img)
 
 
-class CNN:
+class CNN2:
 	def __init__(self):
 		self.height = 128
 		self.width = 128
@@ -35,10 +32,7 @@ class CNN:
 
 	def build_model(self):
 		model = Sequential()
-		model.add(Conv2D(64, kernel_size=(3, 3),activation='linear',input_shape=(self.height,self.width,self.channels),padding='same'))
-		
-
-
+		model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',input_shape=(self.height,self.width,self.channels),padding='same'))
 		model.add(LeakyReLU(alpha=0.1))
 		model.add(MaxPooling2D((2, 2),padding='same'))
 
@@ -84,6 +78,5 @@ class CNN:
 	def test(self):
 		pass
 
-if __name__ == "__main__":
-	cnn = CNN()
-	#cnn.train()
+cnn = CNN2()
+cnn.train()
