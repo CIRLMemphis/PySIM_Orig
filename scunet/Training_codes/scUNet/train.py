@@ -146,6 +146,6 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
 
-        print ("[Epoch %d] [Batch %d/%d] [loss: %f]" % (epoch, batch_idx, len(train_dataloader), loss.item()))
+        print ('epoch : ',epoch, 'loss: ',loss.item())
 
-        torch.save(model.state_dict(), "/home/star/0_code_lhj/DL-SIM-github/Training_codes/scUNet/sUNet_microtubule_"+str(epoch+1)+".pkl")
+        torch.save(model.state_dict(), "out/sUNet_microtubule_"+str(epoch+1)+".pkl")
