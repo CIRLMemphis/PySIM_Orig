@@ -7,8 +7,8 @@ import sys
 
 class mat_file:
 	def __init__(self):
-		self.inp_fname = '../../../../../input/U2OSActin'
-		self.out_fname = '../../../../../output/output/outU2OSActin'
+		self.inp_fname = '../../../../input/U2OSActin'
+		self.out_fname = '../../../../output/output/outU2OSActin'
 		self.limit = 50 #How many image files we want to train
 		self.Nthe = 3
 		self.Nphi = 5

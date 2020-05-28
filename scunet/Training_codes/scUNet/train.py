@@ -22,9 +22,7 @@ from torchsummary import summary
 from unet_model import UNet
 import sys
 
-model = UNet(n_channels=5, n_classes=1)
-print(summary(model, (5, 128, 128)))
-sys.exit()
+
 
 
 class ToTensor(object):
