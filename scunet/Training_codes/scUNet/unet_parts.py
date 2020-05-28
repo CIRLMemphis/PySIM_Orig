@@ -46,6 +46,14 @@ class down(nn.Module):
         x = self.mpconv(x)
         return x
 
+class up_no_skipconn(nn.Module):
+    def __init__(self, in_ch, out_ch, bilinear=False):
+        super(up_no_skipconn, self).__init__()
+        self.up_no_skipconn = nn.ConvTranspose2d(in_ch, out_ch, 2, stride=2)
+
+    def forward(self, x1, x2):
+        x2 = self.up_no_skipconn(x1)
+        return x2
 
 class up(nn.Module):
     def __init__(self, in_ch, out_ch, bilinear=False):
