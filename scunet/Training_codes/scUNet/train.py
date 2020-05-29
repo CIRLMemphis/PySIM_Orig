@@ -81,6 +81,17 @@ class ReconsDataset(torch.utils.data.Dataset):
              sample = self.transform(sample)
          return sample
 
+class ImageDataset(torch.utils.data.Dataset):
+    def __init__(self, inp_images,out_images):
+        self.inp_images = inp_images
+        self.out_images = out_images
+        
+    def __getitem__(self, index):
+        return (self.inp_images[index], self.out_images[index])
+
+    def __len__(self):
+        return len(self.inp_images)
+
 def get_learning_rate(epoch):
     limits = [3, 8, 12]
     lrs = [1, 0.1, 0.05, 0.005]
@@ -112,7 +123,12 @@ if __name__ == "__main__":
     image = torch.from_numpy(X_train).float()
     gt =  torch.from_numpy(y_train).float()
     #print(image.shape)
-    train_dataloader = torch.utils.data.DataLoader(X_train, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
+
+
+    train_data = ImageDataset(X_train,y_train)
+    test_data = ImageDataset(X_test,y_test)
+    train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop  
+    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
     
 
     model = UNet(n_channels=n_channels, n_classes=1)
@@ -129,23 +145,23 @@ if __name__ == "__main__":
         for p in optimizer.param_groups:
             p['lr'] = lr
             print("learning rate = {}".format(p['lr']))
+        for batch_idx, items in enumerate(train_dataloader):
+            image = items[0]
+            gt = items[1]
+            model.train()
 
-        model.train()
-        
+            gt = gt.float()
+            if have_cuda:
+                gt = gt.cuda(cuda)
+            
+            pred = model(image)
 
+            loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        gt = gt.float()
-        if have_cuda:
-            gt = gt.cuda(cuda)
-        
-        pred = model(image)
-
-        loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
-        
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        print ('epoch : ',epoch, 'loss: ',loss.item())
+            print ('epoch : ',epoch, 'loss: ',loss.item())
 
         torch.save(model.state_dict(), "out/sUNet_microtubule_"+str(epoch+1)+".pkl")
