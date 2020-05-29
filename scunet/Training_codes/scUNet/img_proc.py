@@ -13,8 +13,8 @@ class img_proc:
 		self.out_dir = out_dir
 
 	def SaveImg(self,act_img,pred_img):
-		act_img  = np.reshape(act_img, (len(act_img), len(act_img)))
-		pred_img = np.reshape(pred_img, (len(pred_img), len(pred_img)))
+		#act_img  = np.reshape(act_img, (len(act_img), len(act_img)))
+		#pred_img = np.reshape(pred_img, (len(pred_img), len(pred_img)))
 		l = os.listdir(self.out_dir)
 		c = len(l)
 
