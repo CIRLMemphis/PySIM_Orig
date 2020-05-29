@@ -4,14 +4,15 @@ import numpy as np
 import random
 from sklearn.model_selection import train_test_split
 import sys
+from config import *
 
-class mat_file:
+class mat_file():
 	def __init__(self):
-		self.inp_fname = '../../../../input/U2OSActin'
-		self.out_fname = '../../../../output/output/outU2OSActin'
-		self.limit = 50 #How many image files we want to train
-		self.Nthe = 3
-		self.Nphi = 5
+		self.inp_fname = inp_fname
+		self.out_fname = out_fname
+		self.limit = limit #How many image files we want to train
+		self.Nthe = Nthe
+		self.Nphi = Nphi
 
 
 	def get_images(self):

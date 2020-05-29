@@ -14,6 +14,7 @@ from torch.utils.data import  DataLoader
 from skimage import io, transform
 from mat_file import mat_file
 from torchsummary import summary
+from img_proc import img_proc
 
 #import sys
 #path = '/home/star/0_code_lhj/DL-SIM-github/Training_codes/scUNet/'
@@ -57,8 +58,12 @@ def save_pred(epoch,model,test_dataloader):
     pred = model(img)
     pred = pred.detach().cpu().numpy().astype(np.uint32)
     img = img.detach().cpu().numpy().astype(np.uint32)
-    print(img.shape,pred.shape)
-    sys.exit()
+    pred = pred[0][0]
+    img = img[0][0]
+    ip = img_proc()
+    ip.SaveImg(img,pred)
+
+
 
 
 if __name__ == "__main__":
@@ -115,6 +120,6 @@ if __name__ == "__main__":
             optimizer.step()
 
             print ('epoch : ',epoch, 'loss: ',loss.item())
-        #if epoch%10 == 5:
+        if epoch%10 == 5:
             save_pred(epoch,model,test_dataloader)
         torch.save(model.state_dict(), "out/sUNet_microtubule_"+str(epoch+1)+".pkl")
