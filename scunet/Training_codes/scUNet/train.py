@@ -25,69 +25,16 @@ import sys
 
 
 
-class ToTensor(object):
-    """Convert ndarrays in sample to Tensors."""
-
-    def __call__(self, sample):
-        data_in, data_out = sample['image_in'], sample['groundtruth']
-
-        # swap color axis because
-        # numpy image: H x W x C
-        # torch image: C X H X W
-        #image = image.transpose((2, 0, 1))
-        #landmarks = landmarks.transpose((2, 0, 1))
-        
-        #return {'image': image, 'landmarks': torch.from_numpy(landmarks)}
-        return {'image_in': torch.from_numpy(data_in),
-               'groundtruth': torch.from_numpy(data_out)}
-
-class ReconsDataset(torch.utils.data.Dataset):
-     def __init__(self, train_in_path,train_gt_path, transform, img_type,in_size):
-        self.train_in_path = train_in_path
-        self.train_gt_path = train_gt_path
-        self.transform = transform
-        self.img_type = img_type
-        self.in_size = in_size
-        self.dirs_gt = os.listdir(self.train_gt_path)
-     def __len__(self):
-        dirs = os.listdir(self.train_gt_path)   # open the files
-        return len(dirs)            # because one of the file is for groundtruth
-
-     def __getitem__(self, idx):
-         image_name = os.path.join(self.train_gt_path, self.dirs_gt[idx])
-         data_gt = io.imread(image_name)
-         max_out = 15383.0
-         data_gt = data_gt/max_out
-         
-         filepath = os.path.join(self.train_in_path, self.dirs_gt[idx][:-4])
-         #filepath = os.listdir(filepath)
-         #train_in_size = len(filepath)
-         train_in_size = 15
-         
-         data_in = np.zeros((self.in_size, self.in_size, train_in_size))
-         filepath = os.path.join(self.train_in_path, self.dirs_gt[idx][:-4])
-         for i in range(train_in_size):
-             if i <= 9:
-                 image_name = os.path.join(filepath, "LE_0"+str(i)+"." + self.img_type)
-             else:
-                image_name = os.path.join(filepath, "LE_"+str(i)+"." + self.img_type)
-             image = io.imread(image_name)
-             data_in[:,:,i] = image
-         max_in = 196.0
-         data_in = data_in/max_in
-         sample = {'image_in': data_in, 'groundtruth': data_gt}
-         
-         if self.transform:
-             sample = self.transform(sample)
-         return sample
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, inp_images,out_images):
         self.inp_images = inp_images
-        self.out_images = out_images
+        self.out_images = out_images.astype(int)
         
     def __getitem__(self, index):
-        return (self.inp_images[index], self.out_images[index])
+        x = torch.from_numpy(self.inp_images[index]).float()
+        y = torch.from_numpy(self.out_images[index].astype(int)).float()
+        return (x, y)
 
     def __len__(self):
         return len(self.inp_images)
@@ -101,7 +48,17 @@ def get_learning_rate(epoch):
             return lr * learning_rate
         return lrs[-1] * learning_rate
 
-
+def save_pred(epoch,model,test_dataloader):
+    model.eval()
+    model.train()
+    items = next(iter(test_dataloader)) 
+    gt = items[1]
+    img = items[0]
+    pred = model(img)
+    pred = pred.detach().cpu().numpy().astype(np.uint32)
+    img = img.detach().cpu().numpy().astype(np.uint32)
+    print(img.shape,pred.shape)
+    sys.exit()
 
 
 if __name__ == "__main__":
@@ -119,10 +76,7 @@ if __name__ == "__main__":
     X_test = np.rollaxis(X_test, 3, 1)
     y_test = np.rollaxis(y_test, 3, 1) 
 
-    #print(X_train[0])
-    image = torch.from_numpy(X_train).float()
-    gt =  torch.from_numpy(y_train).float()
-    #print(image.shape)
+
 
 
     train_data = ImageDataset(X_train,y_train)
@@ -139,8 +93,6 @@ if __name__ == "__main__":
 
 #    loss_all = np.zeros((2000, 4))
     for epoch in range(2000):
-        
-
         lr = get_learning_rate(epoch)
         for p in optimizer.param_groups:
             p['lr'] = lr
@@ -163,5 +115,6 @@ if __name__ == "__main__":
             optimizer.step()
 
             print ('epoch : ',epoch, 'loss: ',loss.item())
-
+        #if epoch%10 == 5:
+            save_pred(epoch,model,test_dataloader)
         torch.save(model.state_dict(), "out/sUNet_microtubule_"+str(epoch+1)+".pkl")
