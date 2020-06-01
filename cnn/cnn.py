@@ -8,15 +8,12 @@ from keras.layers.advanced_activations import LeakyReLU
 #from mat_files_proc import mat_files_proc
 import numpy as np
 from keras.utils import to_categorical
-<<<<<<< HEAD
 #from img_proc import img_proc
 import tensorlayer as tl
 from tensorlayer.layers import (Input, Conv2d, BatchNorm2d, Elementwise, SubpixelConv2d, Flatten, Dense)
 from tensorlayer.models import Model
-=======
 from img_proc import img_proc
 import keras.backend as kb
->>>>>>> 98b1206255e2b69a67193f6b8fe351a3ee0c86f0
 
 class PredictionCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs={}):
