@@ -120,6 +120,6 @@ if __name__ == "__main__":
             optimizer.step()
 
             print ('epoch : ',epoch, 'loss: ',loss.item())
-        if epoch%10 == 5:
+        #if epoch%10 == 5:
             save_pred(epoch,model,test_dataloader)
         torch.save(model.state_dict(), "out/sUNet_microtubule_"+str(epoch+1)+".pkl")

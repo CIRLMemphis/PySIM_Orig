@@ -31,6 +31,7 @@ class mat_file():
 		
 		inp_images,out_images = np.array(inp_images),np.array(out_images)
 		X_train, X_test, y_train, y_test = train_test_split(inp_images, out_images, test_size=0.1)
+		print(y_train.shape)
 		y_train = np.reshape(y_train, (len(y_train), len(y_train[0]), len(y_train[0]),1))
 		y_test = np.reshape(y_test, (len(y_test), len(y_test[0]), len(y_test[0]),1))
 		#print(type(X_train))
