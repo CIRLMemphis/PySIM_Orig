@@ -10,6 +10,7 @@ import numpy as np
 from keras.utils import to_categorical
 from img_proc import img_proc
 import tensorlayer as tl
+import keras.backend as kb
 
 
 class PredictionCallback(tf.keras.callbacks.Callback):    
@@ -68,6 +69,8 @@ class UNet:
 		out = self.down(out,128)
 		out = self.down(out,256)
 		out = self.down(out,512)
+		out = self.down(out,1024)
+		out = self.up(out,512)
 		out = self.up(out,256)
 		out = self.up(out,128)
 		out = self.up(out,64)
@@ -77,11 +80,15 @@ class UNet:
 		print(model.summary())
 		self.model = model
 
+	def custom_loss_function(self, y_actual, y_predicted):
+		custom_loss_value = kb.mean(kb.sum(5*kb.square(y_actual - y_predicted) + (y_actual - y_predicted) ))
+		return custom_loss_value
+
 	def train(self):
 		mfp = mat_files_proc()
 		X_train, X_test, y_train, y_test = mfp.get_images()
 		model = self.model
-		model.compile(loss='mse',optimizer=keras.optimizers.Adadelta(),
+		model.compile(loss=custom_loss_function,optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 		model.fit(X_train,y_train,epochs=1000,callbacks=[PredictionCallback()],validation_data=(X_test, y_test))
 		p = model.predict(inp_images[0])
