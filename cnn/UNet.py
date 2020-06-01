@@ -74,6 +74,15 @@ class UNet:
 		out = self.up(out,256)
 		out = self.up(out,128)
 		out = self.up(out,64)
+
+		out = self.down(out,128)
+		out = self.down(out,256)
+		out = self.down(out,512)
+		out = self.down(out,1024)
+		out = self.up(out,512)
+		out = self.up(out,256)
+		out = self.up(out,128)
+		out = self.up(out,64)		
 		out = self.up(out,1)
 
 		model = Model(inputs=[inp],outputs=out)
