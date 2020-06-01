@@ -32,7 +32,7 @@ class UNet:
 	def __init__(self):
 		self.height = 128
 		self.width = 128
-		self.channels = 5
+		self.channels = 15
 		self.kernel_size = (3, 3)
 		self.act1 = 'linear'
 		self.pad = 'same'
