@@ -88,7 +88,7 @@ class UNet:
 		mfp = mat_files_proc()
 		X_train, X_test, y_train, y_test = mfp.get_images()
 		model = self.model
-		model.compile(loss=custom_loss_function,optimizer=keras.optimizers.Adadelta(),
+		model.compile(loss=self.custom_loss_function,optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 		model.fit(X_train,y_train,epochs=1000,callbacks=[PredictionCallback()],validation_data=(X_test, y_test))
 		p = model.predict(inp_images[0])
