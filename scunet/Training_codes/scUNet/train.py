@@ -56,11 +56,11 @@ def save_pred(epoch,model,test_dataloader):
     gt = items[1]
     img = items[0]
     pred = model(img)
+    loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
     pred = pred.detach().cpu().numpy().astype(np.uint32)
     img = img.detach().cpu().numpy().astype(np.uint32)
     pred = pred[0][0]
     img = img[0][0]
-    loss = (pred-img).abs().mean() + 5 * ((pred-img)**2).mean()
     print('Validation loss : ',loss.item())
     ip = img_proc()
     ip.SaveImg(img,pred)
@@ -123,5 +123,5 @@ if __name__ == "__main__":
 
         print ('epoch : ',epoch, 'loss: ',loss.item())
         #if epoch%10 == 5:
-            save_pred(epoch,model,test_dataloader)
-        torch.save(model.state_dict(), "out/sUNet_microtubule_"+str(epoch+1)+".pkl")
+        save_pred(epoch,model,test_dataloader)
+        torch.save(model.state_dict(), "D:/NNData/NNData_0520/model/sUNet_microtubule_"+str(epoch)+".pkl")

@@ -15,15 +15,17 @@ import keras.backend as kb
 
 class PredictionCallback(tf.keras.callbacks.Callback):    
   def on_epoch_end(self, epoch, logs={}):
-  	if epoch%10 != 5:
+  	if epoch%10 != 0:
   		return
-  	y_pred = self.model.predict(self.validation_data[0])
+  	y_pred = self.model.predict(self.validation_data[0])[0]
+  	y_pred = np.swapaxes(y_pred,0,2)
   	act_img = self.validation_data[0][0]
-  	pred_img = y_pred[0]
+  	act_img = np.swapaxes(act_img,0,2)
+  	print(len(act_img),len(y_pred))
 
-  	#return
+
   	ip = img_proc()
-  	ip.SaveImg(act_img,pred_img)
+  	ip.SaveImg(act_img[0],y_pred[0])
 
 
 
@@ -48,7 +50,6 @@ class UNet:
 		out = Conv2D(n_chan, self.kernel_size, activation=self.act1,padding=self.pad)(out)
 		out = BatchNormalization()(out)
 		out = LeakyReLU(alpha=self.alpha)(out)
-		out = Add()([out1,out])
 		return out
 
 	def down(self,inp,n_chan):
@@ -56,8 +57,18 @@ class UNet:
 		out = self.double_conv(out,n_chan)
 		return out
 
+	def inconv(self,inp,n_chan):
+		return self.double_conv(inp,n_chan)
+
+	def outconv(self,inp,n_chan):
+		return Conv2D(n_chan, self.kernel_size, activation=self.act1,padding=self.pad)(inp)
+
+
+
 	def up(self,inp,n_chan):
-		out = Conv2DTranspose(n_chan,kernel_size=self.kernel_size,padding=self.pad)(inp)
+		out1 = inp
+		out = Conv2DTranspose(n_chan*2,kernel_size=self.kernel_size,padding=self.pad)(inp)
+		out = Add()([out1,out])
 		out = UpSampling2D()(out)
 		out = self.double_conv(out,n_chan)
 		return out		
@@ -65,7 +76,7 @@ class UNet:
 
 	def build_model(self):
 		inp = Input(self.shape)
-		out = Conv2D(64, kernel_size=(3, 3),activation='linear',input_shape=(self.height,self.width,self.channels),padding='same')(inp)
+		out1 = out = Conv2D(64, kernel_size=(3, 3),activation='linear',input_shape=(self.height,self.width,self.channels),padding='same')(inp)
 		out = self.down(out,128)
 		out = self.down(out,256)
 		out = self.down(out,512)
@@ -74,7 +85,10 @@ class UNet:
 		out = self.up(out,256)
 		out = self.up(out,128)
 		out = self.up(out,64)
+		out = Add()([out1,out])
+		out = self.outconv(out,self.channels)
 
+		out = self.inconv(out,self.channels*2)
 		out = self.down(out,128)
 		out = self.down(out,256)
 		out = self.down(out,512)
@@ -82,8 +96,9 @@ class UNet:
 		out = self.up(out,512)
 		out = self.up(out,256)
 		out = self.up(out,128)
-		out = self.up(out,64)		
-		out = self.up(out,1)
+		out = self.up(out,64)
+		out = self.up(out,32)		
+		out = self.outconv(out,1)
 
 		model = Model(inputs=[inp],outputs=out)
 		print(model.summary())
