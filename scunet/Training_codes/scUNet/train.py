@@ -121,7 +121,7 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
-        print ('epoch : ',epoch, 'loss: ',loss.item())
+        print ('epoch : ',epoch, 'training loss: ',loss.item())
         #if epoch%10 == 5:
         save_pred(epoch,model,test_dataloader)
         torch.save(model.state_dict(), "D:/NNData/NNData_0520/model/sUNet_microtubule_"+str(epoch)+".pkl")
