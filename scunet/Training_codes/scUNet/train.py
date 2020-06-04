@@ -55,7 +55,8 @@ def save_pred(epoch,model,test_dataloader):
     items = next(iter(test_dataloader)) 
     gt = items[1]
     img = items[0]
-    pred = model(img)
+    pred = model(img.cuda(cuda))
+    gt = gt.cuda(cuda)
     loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
     pred = pred.detach().cpu().numpy().astype(np.uint32)
     img = img.detach().cpu().numpy().astype(np.uint32)
@@ -63,7 +64,7 @@ def save_pred(epoch,model,test_dataloader):
     img = img[0][0]
     print('Validation loss : ',loss.item())
     ip = img_proc()
-    ip.SaveImg(img,pred)
+    ip.SaveImg(np.squeeze(gt.detach().cpu().numpy()),pred)
 
 
 
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     train_data = ImageDataset(X_train,y_train)
     test_data = ImageDataset(X_test,y_test)
     train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop  
-    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
+    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=False, pin_memory=False) # better than for loop
     
 
     model = UNet(n_channels=n_channels, n_classes=1)
@@ -111,6 +112,7 @@ if __name__ == "__main__":
 
             gt = gt.float()
             if have_cuda:
+                image = image.cuda(cuda)
                 gt = gt.cuda(cuda)
             
             pred = model(image)
@@ -122,6 +124,6 @@ if __name__ == "__main__":
             optimizer.step()
 
         print ('epoch : ',epoch, 'training loss: ',loss.item())
-        #if epoch%10 == 5:
-        save_pred(epoch,model,test_dataloader)
-        torch.save(model.state_dict(), "D:/NNData/NNData_0520/model/sUNet_microtubule_"+str(epoch)+".pkl")
+        if epoch%100 == 1:
+            save_pred(epoch,model,test_dataloader)
+        #torch.save(model.state_dict(), "D:/NNData/NNData_0520/model/sUNet_microtubule_"+str(epoch)+".pkl")
