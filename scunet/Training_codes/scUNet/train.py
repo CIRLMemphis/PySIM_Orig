@@ -73,7 +73,7 @@ if __name__ == "__main__":
     cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     have_cuda = True if torch.cuda.is_available() else False
     learning_rate = 0.001
-    n_channels = 5
+    n_channels = 15
     # momentum = 0.99
     # weight_decay = 0.0001
     batch_size = 1
