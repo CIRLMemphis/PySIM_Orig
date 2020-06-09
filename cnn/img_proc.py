@@ -7,7 +7,7 @@ plt.figure(figsize=(16, 7))
 
 class img_proc:
 	def __init__(self):
-		self.out_dir = 'D:/NNData/NNData_0520/pred/' #output directory
+		self.out_dir = '../../out/cnnPred/' #output directory
 
 	def SaveImg(self,act_img,pred_img):
 		act_img  = np.reshape(act_img, (len(act_img), len(act_img)))

@@ -6,9 +6,9 @@ from sklearn.model_selection import train_test_split
 
 class mat_files_proc:
 	def __init__(self):
-		self.inp_fname = 'D:/NNData/NNData_0520/in/inFairSIM'
-		self.out_fname = 'D:/NNData/NNData_0520/out/outFairSIM'
-		self.limit = 500 #How many image files we want to train
+		self.inp_fname = '../../in/inFairSIM'
+		self.out_fname = '../../out/outFairSIM'
+		self.limit = 1002 #How many image files we want to train
 		self.Nthe = 3
 		self.Nphi = 5
 

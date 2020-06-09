@@ -1,17 +1,17 @@
 import tensorflow as tf
-import tensorflow.keras as keras
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D,Conv2DTranspose,UpSampling2D
-from tensorflow.keras.layers import LeakyReLU
+import keras 
+from keras import Sequential
+from keras.layers import Conv2D, MaxPooling2D,Conv2DTranspose,UpSampling2D
+from keras.layers import LeakyReLU
 from img_proc import img_proc
-import tensorflow.keras.backend as kb
+import keras.backend as kb
 from mat_files_proc import mat_files_proc
+import numpy as np
 
 class PredictionCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs={}):
     if epoch%100 != 0:
       return
-
     y_pred = self.model.predict(self.validation_data[0])
     act_img = self.validation_data[1][0]
     #print(np.shape(act_img))
@@ -56,7 +56,7 @@ class CNN:
 		print(model.summary())
 
 	def custom_loss_function(self, y_actual, y_predicted):
-		custom_loss_value = kb.mean(kb.sum(5*kb.square(y_actual - y_predicted) + (y_actual - y_predicted) ))
+		custom_loss_value = kb.mean(kb.sum(5*kb.square(y_actual - y_predicted) + kb.abs(y_actual - y_predicted) ))
 		return custom_loss_value
 
 	def train(self):
@@ -66,8 +66,8 @@ class CNN:
 		model.compile(loss=self.custom_loss_function,optimizer=keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999),
               metrics=['accuracy'])
 		model.fit(X_train,y_train,epochs=1000,callbacks=[PredictionCallback()],validation_data=(X_test, y_test))
-		p = model.predict(inp_images[0])
-		print(p)
+		#p = model.predict(inp_images[0])
+		#print(p)
 
 
 
