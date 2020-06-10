@@ -12,7 +12,7 @@ from keras.utils import to_categorical
 import tensorlayer as tl
 from tensorlayer.layers import (Input, Conv2d, BatchNorm2d, Elementwise, SubpixelConv2d, Flatten, Dense)
 from tensorlayer.models import Model
-from img_proc import img_proc
+#from img_proc import img_proc
 import keras.backend as kb
 
 class PredictionCallback(tf.keras.callbacks.Callback):
@@ -84,5 +84,5 @@ class CNN:
 
 if __name__ == "__main__":
 	cnn = CNN()
-	cnn.train()
+	#cnn.train()
 

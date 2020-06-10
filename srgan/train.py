@@ -68,7 +68,7 @@ def get_train_data():
 def train():
     G = get_G((batch_size, 128, 128, 5))
     D = get_D((batch_size, 256, 256, 1))
-    VGG = tl.models.vgg19(pretrained=True, end_with='pool4', mode='static')
+    #VGG = tl.models.vgg19(pretrained=True, end_with='pool4', mode='static')
 
     lr_v = tf.Variable(lr_init)
     g_optimizer_init = tf.optimizers.Adam(lr_v, beta_1=beta1)
@@ -77,7 +77,7 @@ def train():
 
     G.train()
     D.train()
-    VGG.train()
+    #VGG.train()
 
     train_ds = get_train_data()
 
@@ -94,7 +94,7 @@ def train():
                 mse_loss = tl.cost.mean_squared_error(fake_hr_patchs, hr_patchs, is_mean=True)
             grad = tape.gradient(mse_loss, G.trainable_weights)
             g_optimizer_init.apply_gradients(zip(grad, G.trainable_weights))
-            print('Epoch: ',epoch, ' mse loss : ', mse_loss)
+            #print('Epoch: ',epoch, ' mse loss : ', mse_loss)
         #if (epoch != 0) and (epoch % 10 == 0):
             #tl.vis.save_images(fake_hr_patchs.numpy(), [2, 4], os.path.join(save_dir, 'train_g_init_{}.png'.format(epoch)))
 
