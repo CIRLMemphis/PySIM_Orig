@@ -1,6 +1,11 @@
 out_dir = 'D:/NNData/NNData_0520/pred/' #output directory
 inp_fname = 'D:/NNData/NNData_0520/in/inFairSIM'
 out_fname = 'D:/NNData/NNData_0520/out/outFairSIM'
-limit = 50 #How many image files we want to train
+limit = 500 #How many image files we want to train
 Nthe = 3
 Nphi = 5
+div_lr = 'D:/Momin/datasets/LR/'
+div_hr = 'D:/Momin/datasets/HR/'
+div_dataset = False
+in_channels = 15
+out_channels = 1

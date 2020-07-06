@@ -54,12 +54,9 @@ class mat_file():
 			for i in range(self.Nthe):
 				for j in range(self.Nphi):
 					inp_set.append(inp_img[:,:,0,i,j])
-
-
 			out_img = loadmat(out_file)['crop_g']
 			out_images.append(out_img)
 			inp_images.append(np.transpose(inp_set, (1, 2, 0)))
-
 
 		return self.get_test_train(inp_images,out_images)
 
