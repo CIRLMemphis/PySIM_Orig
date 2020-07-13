@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 from torchvision.models.vgg import vgg16
-import numpy as np
 
 
 class GeneratorLoss(nn.Module):
@@ -15,28 +14,11 @@ class GeneratorLoss(nn.Module):
         self.mse_loss = nn.MSELoss()
         self.tv_loss = TVLoss()
 
-    def chan1_3(self,imgs):
-        ois = imgs.cpu().detach().numpy().tolist()
-        nois = []
-        for i in range(len (ois)):
-            nois.append([])
-            for j in range(3):
-                nois[i].append(ois[i][0])
-        return torch.from_numpy(np.array(nois)).float()
-
-
-
-
     def forward(self, out_labels, out_images, target_images):
-        nois = self.chan1_3(out_images)
-        ntis = self.chan1_3(target_images) 
-        #print(out_labels.shape)
         # Adversarial Loss
         adversarial_loss = torch.mean(1 - out_labels)
         # Perception Loss
-        l1 = self.loss_network(nois)
-        l2 = self.loss_network(ntis)
-        perception_loss = self.mse_loss(l1,l2)
+        perception_loss = self.mse_loss(self.loss_network(out_images), self.loss_network(target_images))
         # Image Loss
         image_loss = self.mse_loss(out_images, target_images)
         # TV Loss

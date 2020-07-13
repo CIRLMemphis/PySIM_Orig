@@ -29,9 +29,3 @@ class img_proc:
 			return
 		plt.imshow(act_img)
 		plt.savefig(ofile1)
-		#ofile = ofile2.replace('.png','.txt')
-		#ofile = open(ofile,'a')
-		#ofile.write(str(pred_img))
-		#ofile.write('**************************************')
-		#ofile.write(str(act_img))
-		#ofile.close()

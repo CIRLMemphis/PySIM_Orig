@@ -26,8 +26,8 @@ class UNet(nn.Module):
         self.up22 = up(512, 256)
         self.up32 = up(256, 128)
         self.up42 = up(128, 64)
-        #self.up52 = up_no_skipconn(64, 32)
-        self.unet_2nd_out = outconv(64, n_classes)
+        self.up52 = up_no_skipconn(64, 32)
+        self.unet_2nd_out = outconv(32, n_classes)
 
         
 
@@ -53,6 +53,6 @@ class UNet(nn.Module):
         x = self.up22(x4, x3)
         x = self.up32(x, x2)
         x = self.up42(x, x1)
-        #x = self.up52(x, x1)
+        x = self.up52(x, x1)
         x = self.unet_2nd_out(x)
         return x

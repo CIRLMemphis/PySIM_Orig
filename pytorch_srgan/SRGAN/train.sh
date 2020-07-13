@@ -1,0 +1,1 @@
+#!/bin/bash \n python -u train.py --partition gpuq --nodes 1 --gres=gpu:1 --cpus-per-task=8 --mem-per-cpu=3000M
