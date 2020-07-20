@@ -122,9 +122,11 @@ optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate,  betas=(0.9, 0
 #    loss_all = np.zeros((2000, 4))
 c = 0
 for epoch in range(2000):
-    lr = get_learning_rate(epoch)
+    lr = .001 - (epoch/30000)
+    if lr < .00001:
+        lr = .00001
     for p in optimizer.param_groups:
-        p['lr'] = .001 #lr
+        p['lr'] = lr
         print("learning rate = {}".format(p['lr']))
 
     #print(len(train_dataloader))
