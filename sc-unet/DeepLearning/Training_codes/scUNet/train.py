@@ -16,7 +16,7 @@ from mat_file import mat_file
 from torchsummary import summary
 from img_proc import img_proc
 from tqdm import tqdm
-#import sys
+import sys
 #path = '/home/star/0_code_lhj/DL-SIM-github/Training_codes/scUNet/'
 #sys.path.append(path)
 
@@ -28,6 +28,10 @@ plt.style.use('seaborn-whitegrid')
 plt.style.use('classic')
 plt.figure(figsize=(16, 7))
 
+#model = UNet(n_channels=in_channels, n_classes=out_channels)
+#model.cuda()
+#print(summary(model,(in_channels,256,256)))
+#sys.exit()
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, inp_images,out_images):
@@ -113,7 +117,9 @@ test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, 
    
 
 model = UNet(n_channels=in_channels, n_classes=out_channels)
-#print(summary(model,(in_channels,128,128)))
+if have_cuda:
+    model.cuda()
+print(summary(model,(in_channels,256,256)))
 print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
 if have_cuda:
     model.cuda(cuda)
