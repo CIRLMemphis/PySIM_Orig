@@ -74,10 +74,12 @@ class mat_file():
 		return X_train, X_test, y_train, y_test
 
 	def get_images(self):
+		global mx
 		if div_dataset:
 			data = self.get_div_images()
 			return data
 		inp_images,out_images = [],[]
+		nmx = 0
 		for i in tqdm(range(1,self.limit+1,1)):
 			if i == 436:
 				continue
@@ -89,11 +91,24 @@ class mat_file():
 			inp_set  = []
 			for i in range(self.Nthe):
 				for j in range(self.Nphi):
-					inp_set.append(inp_img[:,:,0,i,j])
+					x = inp_img[:,:,0,i,j]
+					nmx = max(max(y) for y in x)
+					if nmx > mx:
+						mx = nmx
+					inp_set.append(x)
 			out_img = loadmat(out_file)['crop_g']
+			nmx = max(max(y) for y in out_img)
+			if nmx > mx:
+				mx = nmx
 			out_images.append(out_img)
+
 			inp_images.append(np.transpose(inp_set, (1, 2, 0)))
+		print(nmx)
+		if nmx > 1:
+			inp_images = inp_images/mx
+			out_images = out_images/mx
 		data = (inp_images,out_images)
+
 		return data
 
 	def get_data(self):
@@ -102,7 +117,7 @@ class mat_file():
 			data = self.load()
 			return data
 		data = self.get_images()
-		self.store(data)
+		#self.store(data)
 		return data
 
 	def load(self):

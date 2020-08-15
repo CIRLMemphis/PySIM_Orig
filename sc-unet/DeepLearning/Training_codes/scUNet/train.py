@@ -29,18 +29,17 @@ plt.style.use('classic')
 plt.figure(figsize=(16, 7))
 
 #model = UNet(n_channels=in_channels, n_classes=out_channels)
-#model.cuda()
 #print(summary(model,(in_channels,256,256)))
 #sys.exit()
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, inp_images,out_images):
-        self.inp_images = inp_images
-        self.out_images = out_images.astype(int)
+        self.inp_images = inp_images.astype(float)
+        self.out_images = out_images.astype(float)
         
     def __getitem__(self, index):
-        x = torch.from_numpy(self.inp_images[index].astype(int)).float()
-        y = torch.from_numpy(self.out_images[index].astype(int)).float()
+        x = torch.from_numpy(self.inp_images[index].astype(float)).float()
+        y = torch.from_numpy(self.out_images[index].astype(float)).float()
         return (x, y)
 
     def __len__(self):
@@ -55,9 +54,18 @@ def get_learning_rate(epoch):
             return lr * learning_rate
         return lrs[-1] * learning_rate
 
+def save_input(img):
+    img = img[0]
+    #print(img.shape)
+    n = img.shape[0]
+    for i in range(n):
+        plt.imshow(img[i])
+        plt.savefig(out_dir  + 'inp' + str(i) + '.png')
+
+
 def save_pred(epoch,model,test_dataloader):
     cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Evaluating epoch ', epoch)
+    #print('Evaluating epoch ', epoch)
     model.eval()
     items = next(iter(test_dataloader)) 
     gt = items[1]
@@ -72,13 +80,19 @@ def save_pred(epoch,model,test_dataloader):
     #print('**************',gt.shape,img.shape)
     loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
     print('validation loss : ',loss.item())
-    pred = pred.detach().cpu().numpy().astype(np.uint32)
+    pred = pred.detach().cpu().numpy()
     pred = pred[0][0]
+    #for x in pred:
+        #print(x)
 
     ip = img_proc()
     gt = gt.detach().cpu().numpy()
     gt = gt[0][0]
-    ip.SaveImg(gt,pred)  
+    ip.SaveImg(gt,pred)
+    print(max(max(x) for x in gt),max(max(x) for x in pred))
+    if epoch != 0:
+        return
+    save_input(img.detach().cpu().numpy())
 
 
 
@@ -105,21 +119,20 @@ X_train = np.rollaxis(X_train, 3, 1)
 y_train = np.rollaxis(y_train, 3, 1)
 X_test = np.rollaxis(X_test, 3, 1)
 y_test = np.rollaxis(y_test, 3, 1) 
-print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
+
+#print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
 
 
 
 train_data = ImageDataset(X_train,y_train)
 test_data = ImageDataset(X_test,y_test)
 train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop  
-test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=False, pin_memory=False) # better than for loop
+test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
 
    
 
 model = UNet(n_channels=in_channels, n_classes=out_channels)
-if have_cuda:
-    model.cuda()
-print(summary(model,(in_channels,256,256)))
+#print(summary(model,(in_channels,256,256)))
 print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
 if have_cuda:
     model.cuda(cuda)
@@ -138,6 +151,7 @@ for epoch in range(2000):
     #print(len(train_dataloader))
     for batch_idx, items in enumerate(train_dataloader):
         #print(epoch)
+
         image = items[0]
         #print(image.shape)
         gt = items[1]
