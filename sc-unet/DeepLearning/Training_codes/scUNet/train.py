@@ -21,6 +21,7 @@ import sys
 #sys.path.append(path)
 
 from unet_model import UNet
+from unet_3d import UNet3D
 import sys
 from config import *
 import matplotlib.pyplot as plt
@@ -56,12 +57,27 @@ def get_learning_rate(epoch):
 
 def save_input(img):
     img = img[0]
+    print(img.shape)
     #print(img.shape)
     n = img.shape[0]
     for i in range(n):
         plt.imshow(img[i])
         plt.savefig(out_dir  + 'inp' + str(i) + '.png')
 
+
+def get_errors(gt,pr):
+    gt = gt.flatten()
+    pr = pr.flatten()
+    n = len(gt)
+    d = sum([(gt[i]-pr[i])**2 for i in range(n)])
+    d = d/(n)
+    avg_gt = sum(gt)/n
+    avg_pr =  sum(pr)/n
+    var_gt = sum([(avg_gt-y)**2 for y in gt])
+    psnr = 20*math.log10(255/math.sqrt(d))
+    nrmse = math.sqrt(d)/var_gt
+    r = math.sqrt(d)
+    return str(round(r,6)) + '_' + str(round(psnr,4)) + '_' + str(round(nrmse,2))
 
 def save_pred(epoch,model,test_dataloader):
     cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -87,12 +103,15 @@ def save_pred(epoch,model,test_dataloader):
 
     ip = img_proc()
     gt = gt.detach().cpu().numpy()
-    gt = gt[0][0]
-    ip.SaveImg(gt,pred)
-    print(max(max(x) for x in gt),max(max(x) for x in pred))
+    gt = gt[0]
+    if not is_3d:
+        gt = gt[0]
+    er = get_errors(gt,pred)
+    ip.SaveImg(str(epoch) + '_' + er,gt,pred)
+
     if epoch != 0:
         return
-    save_input(img.detach().cpu().numpy())
+    #save_input(img.detach().cpu().numpy())
 
 
 
@@ -115,12 +134,18 @@ if use_valid_file:
     X_train,X_test,y_train,y_test = mf.format(inp_images,out_images,valid_in,valid_out)
 else:
     X_train,X_test,y_train,y_test = mf.get_test_train(inp_images,out_images)
-X_train = np.rollaxis(X_train, 3, 1)
-y_train = np.rollaxis(y_train, 3, 1)
-X_test = np.rollaxis(X_test, 3, 1)
-y_test = np.rollaxis(y_test, 3, 1) 
 
-#print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
+
+print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
+if is_3d:
+    X_test = np.rollaxis(X_test, 4, 2)
+    X_train = np.rollaxis(X_train, 4, 2)
+
+y_train = np.rollaxis(y_train, 3, 1)
+y_test = np.rollaxis(y_test, 3, 1) 
+print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
+
+
 
 
 
@@ -130,8 +155,10 @@ train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size
 test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
 
    
-
-model = UNet(n_channels=in_channels, n_classes=out_channels)
+if is_3d:
+    model = UNet3D(n_channels=in_channels, n_classes=out_channels)
+else:
+    model = UNet(n_channels=in_channels, n_classes=out_channels)
 #print(summary(model,(in_channels,256,256)))
 print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
 if have_cuda:
@@ -140,7 +167,7 @@ optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate,  betas=(0.9, 0
 
 #    loss_all = np.zeros((2000, 4))
 c = 0
-for epoch in range(2000):
+for epoch in range(5000):
     lr = .001 - (epoch/30000)
     if lr < .00001:
         lr = .00001

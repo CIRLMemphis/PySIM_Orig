@@ -1,7 +1,10 @@
 # full assembly of the sub-parts to form the complete net
-import torch.nn as nn
-from unet_parts import *
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from config import *
+from torchsummary import summary
+from unet_parts import *
 
 class UNet(nn.Module):
     def __init__(self, n_channels, n_classes):
@@ -87,3 +90,5 @@ class UNet(nn.Module):
         x = self.up35(x, x1)
         x = self.unet_5th_out(x)
         return x
+
+

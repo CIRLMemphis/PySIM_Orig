@@ -12,20 +12,32 @@ class img_proc:
 	def __init__(self):
 		self.out_dir = out_dir
 
-	def SaveImg(self,act_img,pred_img):
-		#act_img  = np.reshape(act_img, (len(act_img), len(act_img)))
-		#pred_img = np.reshape(pred_img, (len(pred_img), len(pred_img)))
-		l = os.listdir(self.out_dir)
-		c = len(l)
-
-		ofile2 = self.out_dir + 'pred_img' + str(c) + '.png'
+	def SaveImg(self,epoch,act_img,pred_img):
+		if is_3d:
+			self.Save3DImg(epoch,act_img,pred_img)
+			return
+		ofile2 = self.out_dir + 'pred' + str(epoch) + '.png'
 		plt.figure(figsize=(8, 3.5))
 
 		plt.imshow(pred_img)
 		plt.savefig(ofile2)
 
-		ofile1 = self.out_dir + 'act_img.png'
+		ofile1 = self.out_dir + 'gt.png'
 		if os.path.isfile(ofile1):
 			return
 		plt.imshow(act_img)
 		plt.savefig(ofile1)
+
+
+	def Save3DImg(self,epoch,act_img,pred_img):
+		print(act_img.shape,pred_img.shape)
+		for i in range(3):
+			ofile2 = self.out_dir + 'pred' + str(epoch) + '_' + str(i) + '.png'
+			plt.figure(figsize=(8, 3.5))
+
+			plt.imshow(pred_img[i])
+			plt.savefig(ofile2)
+
+			ofile1 = self.out_dir + '_' + str(i) + 'gt.png'
+			plt.imshow(act_img[i])
+			plt.savefig(ofile1)
