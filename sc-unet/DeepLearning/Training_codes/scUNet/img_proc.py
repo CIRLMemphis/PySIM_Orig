@@ -13,7 +13,7 @@ class img_proc:
 		self.out_dir = out_dir
 
 	def SaveImg(self,epoch,act_img,pred_img):
-		if is_3d:
+		if is_3d and not convert_to_2d:
 			self.Save3DImg(epoch,act_img,pred_img)
 			return
 		ofile2 = self.out_dir + 'pred' + str(epoch) + '.png'
@@ -31,7 +31,7 @@ class img_proc:
 
 	def Save3DImg(self,epoch,act_img,pred_img):
 		print(act_img.shape,pred_img.shape)
-		for i in range(3):
+		for i in range(size_3rd_dim):
 			ofile2 = self.out_dir + 'pred' + str(epoch) + '_' + str(i) + '.png'
 			plt.figure(figsize=(8, 3.5))
 

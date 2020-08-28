@@ -90,19 +90,36 @@ class mat_file():
 			inp_set  = []
 			for i in range(self.Nthe):
 				for j in range(self.Nphi):
+					imgs = []
 					if is_3d:
-						img = inp_img[:,:,:,i,j]
+						for k in range(size_3rd_dim):
+							imgs.append(inp_img[:,:,k,i,j])
 					else:
-						img = inp_img[:,:,0,i,j]
+						imgs = inp_img[:,:,0,i,j]
+
 					if normalize:
-						img = img/np.max(img)
-					inp_set.append(img)
+						imgs = imgs/np.max(imgs)
+					inp_set.append(imgs)
 			out_img = loadmat(out_file)['crop_g']
+			s = out_img.shape
+			if len(s) == 3:
+				out_img = np.swapaxes(out_img,0,2)
+
+			imgs = []
+			if is_3d:
+				for k in range(size_3rd_dim):
+					imgs.append(out_img[i])
+			else:
+				imgs = out_img			
+
 			if normalize:
-				out_img = out_img/np.max(out_img)			
-			out_images.append(out_img)
+				imgs = imgs/np.max(imgs)			
+			out_images.append([imgs])
 			inp_images.append(inp_set)
 
+		inp_images,out_images = np.array(inp_images),np.array(out_images)
+		if convert_to_2d:
+			inp_images,out_images = self.get_2d_converted_data(inp_images,out_images)
 		data = (inp_images,out_images)
 		return data
 
@@ -116,14 +133,16 @@ class mat_file():
 		self.store(data)
 		return data
 
+
+
 	def load(self):
 		files = os.listdir(pickle_loc)
 		x,y = [],[]
 		for f in files:
 			f = pickle_loc + f
 			d = pickle.load(open(f, "rb" ))
-			x += d[0]
-			y += d[1]
+			x += d[0].tolist()
+			y += d[1].tolist()
 
 		x,y = np.array(x),np.array(y)
 		print(x.shape,y.shape)
@@ -141,7 +160,17 @@ class mat_file():
 			pickle.dump((x,y),open(pfile,"wb"))
 			x,y = np.array(x),np.array(y)
 
+	def get_2d_converted_data(self,inp_images,out_images):
+		si,so = inp_images.shape,out_images.shape
+		print(si,so)
+		inp_images = np.reshape(inp_images,(si[0],si[1]*si[2],si[3],si[4]))
+		out_images = np.reshape(out_images,(so[0],so[1]*so[2],so[3],so[4]))
+		return (inp_images,out_images)
 
+	def get_3d_converted_data(self,imgs,ch,d):
+		si = imgs.shape
+		imgs = np.reshape(imgs,(si[0],int(si[1]/d),int(si[1]/ch),si[2],si[3]))
+		return imgs
 
 
 if __name__ == "__main__":

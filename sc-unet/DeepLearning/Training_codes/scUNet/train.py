@@ -66,6 +66,7 @@ def save_input(img):
 
 
 def get_errors(gt,pr):
+    #print(gt.shape,pr.shape)
     gt = gt.flatten()
     pr = pr.flatten()
     n = len(gt)
@@ -103,10 +104,9 @@ def save_pred(epoch,model,test_dataloader):
 
     ip = img_proc()
     gt = gt.detach().cpu().numpy()
-    gt = gt[0]
-    if not is_3d:
-        gt = gt[0]
+    gt = gt[0][0]
     er = get_errors(gt,pred)
+    print('saving...',gt.shape,pred.shape)
     ip.SaveImg(str(epoch) + '_' + er,gt,pred)
 
     if epoch != 0:
@@ -131,18 +131,12 @@ inp_images,out_images = mf.get_data()
 if use_valid_file:
     mf.set_valid_dir()
     valid_in,valid_out = mf.get_images()
-    X_train,X_test,y_train,y_test = mf.format(inp_images,out_images,valid_in,valid_out)
+    X_train,X_test,y_train,y_test = inp_images,valid_in,out_images,valid_out
 else:
     X_train,X_test,y_train,y_test = mf.get_test_train(inp_images,out_images)
 
+#print(X_train[1].tolist(),y_train[1].tolist())
 
-print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
-if is_3d:
-    X_test = np.rollaxis(X_test, 4, 2)
-    X_train = np.rollaxis(X_train, 4, 2)
-
-y_train = np.rollaxis(y_train, 3, 1)
-y_test = np.rollaxis(y_test, 3, 1) 
 print(X_train.shape,y_train.shape,X_test.shape,y_test.shape)
 
 
@@ -155,14 +149,15 @@ train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size
 test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
 
    
-if is_3d:
-    model = UNet3D(n_channels=in_channels, n_classes=out_channels)
+if is_3d and not convert_to_2d:
+    model = UNet3D(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
 else:
-    model = UNet(n_channels=in_channels, n_classes=out_channels)
-#print(summary(model,(in_channels,256,256)))
+    model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
+
 print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
 if have_cuda:
     model.cuda(cuda)
+#print(summary(model,(X_train.shape[1],256,256)))
 optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate,  betas=(0.9, 0.999))
 
 #    loss_all = np.zeros((2000, 4))
@@ -190,7 +185,7 @@ for epoch in range(5000):
             gt = gt.cuda(cuda)
         
         pred = model(image)
-
+        #print(gt.shape,pred.shape)
         loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
         
         optimizer.zero_grad()

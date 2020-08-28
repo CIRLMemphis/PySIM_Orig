@@ -173,6 +173,6 @@ class UNetTest(nn.Module):
 
 
 cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = UNet3D(n_channels=15, n_classes=1)
+model = UNet3D(n_channels=15, n_classes=3)
 model.cuda(cuda)
-print(summary(model,(15,3,128,128)))
+#print(summary(model,(15,3,128,128)))
