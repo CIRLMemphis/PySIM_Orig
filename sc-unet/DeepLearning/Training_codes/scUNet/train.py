@@ -22,6 +22,7 @@ import sys
 
 from unet_model import UNet
 from unet_3d import UNet3D
+from unet3b import UNet3B
 import sys
 from config import *
 import matplotlib.pyplot as plt
@@ -98,13 +99,16 @@ def save_pred(epoch,model,test_dataloader):
     loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
     print('validation loss : ',loss.item())
     pred = pred.detach().cpu().numpy()
-    pred = pred[0][0]
     #for x in pred:
         #print(x)
 
     ip = img_proc()
     gt = gt.detach().cpu().numpy()
-    gt = gt[0][0]
+    pred = pred[0]
+    gt = gt[0]
+    if not (is_3d and convert_to_2d):
+        pred = pred[0][0]
+        gt = gt[0][0]
     er = get_errors(gt,pred)
     print('saving...',gt.shape,pred.shape)
     ip.SaveImg(str(epoch) + '_' + er,gt,pred)
@@ -151,6 +155,8 @@ test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, 
    
 if is_3d and not convert_to_2d:
     model = UNet3D(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
+elif is_3d:
+    model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
 else:
     model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
 
@@ -167,7 +173,7 @@ for epoch in range(5000):
     if lr < .00001:
         lr = .00001
     for p in optimizer.param_groups:
-        p['lr'] = lr
+        p['lr'] = .001
         print("learning rate = {}".format(p['lr']))
 
     #print(len(train_dataloader))

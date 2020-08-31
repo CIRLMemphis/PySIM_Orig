@@ -10,8 +10,10 @@ import cv2
 import pickle
 import os
 from img_proc import img_proc
-import matplotlib
+import matplotlib.pyplot as plt
 from tqdm import tqdm
+
+
 
 class mat_file():
 	def __init__(self):
@@ -47,6 +49,7 @@ class mat_file():
 				l = len(im)
 			nim = [[[im[i][j][0]*.001172 + im[i][j][1]*.002302 + im[i][j][2]]*.000447 for j in range(l)] for i in range(l)]
 			out_images.append(nim)
+
 
 		print('preprocessed images')
 		inp_images,out_images = inp_images[:limit],out_images[:limit]
@@ -100,29 +103,45 @@ class mat_file():
 					if normalize:
 						imgs = imgs/np.max(imgs)
 					inp_set.append(imgs)
+
+
 			out_img = loadmat(out_file)['crop_g']
+
 			s = out_img.shape
 			if len(s) == 3:
 				out_img = np.swapaxes(out_img,0,2)
 
+
 			imgs = []
 			if is_3d:
 				for k in range(size_3rd_dim):
-					imgs.append(out_img[i])
+					imgs.append(out_img[k])
 			else:
 				imgs = out_img			
 
 			if normalize:
-				imgs = imgs/np.max(imgs)			
+				imgs = imgs/np.max(imgs)
+
+		
 			out_images.append([imgs])
 			inp_images.append(inp_set)
 
 		inp_images,out_images = np.array(inp_images),np.array(out_images)
+
+
 		if convert_to_2d:
 			inp_images,out_images = self.get_2d_converted_data(inp_images,out_images)
 		data = (inp_images,out_images)
 		return data
 
+	def save(self,out_images):
+		print(out_images.shape)
+		for i in range(3):
+			ofile2 = str(i) + '.png'
+			plt.figure(figsize=(8, 3.5))
+
+			plt.imshow(out_images[i])
+			plt.savefig(ofile2)
 
 	def get_data(self):
 		pfile = pickle_loc + '0.p'

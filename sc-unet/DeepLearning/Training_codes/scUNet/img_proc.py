@@ -13,7 +13,7 @@ class img_proc:
 		self.out_dir = out_dir
 
 	def SaveImg(self,epoch,act_img,pred_img):
-		if is_3d and not convert_to_2d:
+		if is_3d:
 			self.Save3DImg(epoch,act_img,pred_img)
 			return
 		ofile2 = self.out_dir + 'pred' + str(epoch) + '.png'

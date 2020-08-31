@@ -23,4 +23,4 @@ in_out_same_size = False
 normalize = True
 is_3d = True
 size_3rd_dim = 3
-convert_to_2d = False
+convert_to_2d = True
