@@ -1,3 +1,8 @@
 *.png
 *.out
 *.mat
+*.jpg
+*.csv
+*.asv
+*.pyc
+*.json

@@ -1,0 +1,21 @@
+out_dir = 'D:/NNData/NNData_0626/test_result/' #output directory
+inp_fname ='D:/NNData/NNData_0626/test_valid/in/inFairSIM'
+#out_fname = 'D:/NNData/NNData_0626/test_valid/out/outFairSIM'
+limit = 1183 #How many image files we want to train
+Nthe = 3
+Nphi = 5
+pickle_loc = 'D:/NNData/NNData_0626/pickle_test/'
+model_loc = 'D:/NNData/NNData_0626/model/'
+use_valid_file = True
+div_dataset = False
+out_channels = 1
+min_lr = .00001
+lr_c = 150000
+data_reduced = False
+in_out_same_size = True
+normalize = True
+is_3d = False
+convert_to_2d = False
+
+#valid_in = 'D:/NNData/NNData_0626/test_valid/in/inFairSIM'
+#valid_out = 'D:/NNData/NNData_0626/test_valid/out/outFairSIM'
