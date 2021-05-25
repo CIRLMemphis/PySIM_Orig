@@ -3,7 +3,7 @@ import numpy as np
 import os
 import math
 import torch
-from torch.utils.data import  DataLoader
+from torch.utils.data import DataLoader
 from skimage import io, transform
 from mat_file import mat_file
 from torchsummary import summary
@@ -13,8 +13,6 @@ import sys
 import pandas as pd
 from skimage.metrics import structural_similarity
 from unet_model import UNet
-from unet_3d import UNet3D
-from unet3b import UNet3B
 import sys
 from config import *
 import matplotlib.pyplot as plt
@@ -121,10 +119,10 @@ if data_reduced and single_unet: # 3D Converted to 2D with data reduction of red
     model = UNet3SIM(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
 else:
     model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
-## Thats tautology TO-DO - fix and optimize
+
 start_epoch = 0
 if load_model:
-    weight = torch.load(model_loc+"650.pt")
+    weight = torch.load(model_file)
     model.load_state_dict(weight['model_state_dict'])
     start_epoch = weight['epoch']
 
@@ -140,7 +138,7 @@ c = 0
 val_metrics =  {'loss':[], 'mse1':[], 'ssim1':[], 'psnr1':[],
                 'mse2':[], 'ssim2':[],'psnr2':[],
                 'mse3':[], 'ssim3':[],'psnr3':[]}
-epochs = 1000
+epochs = 3000
 
 for epoch in range(start_epoch, epochs):
     lr = .001 - (epoch/30000)

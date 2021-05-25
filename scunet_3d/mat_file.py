@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 import sys
 from config import *
 import os
-import cv2
 import pickle
 import os
 from img_proc import img_proc
@@ -16,7 +15,7 @@ class mat_file():
 	def __init__(self):
 		self.inp_fname = inp_fname
 		self.out_fname = out_fname
-		self.limit = limit #How many image files we want to train
+		self.limit = limit 
 		self.Nthe = Nthe
 		self.Nphi = Nphi
 
@@ -26,31 +25,7 @@ class mat_file():
 		self.out_fname = valid_out
 		self.limit = valid_limit
 
-	def get_div_images(self):
-		files = os.listdir(div_lr)
-		inp_images,out_images = [],[]
-		l = None
-		for f in files:
-			fname = div_lr + f
-			im = cv2.imread(fname)
-			if not l:
-				l = len(im)
-			nim = [[[im[i][j][0]*.001172 + im[i][j][1]*.002302 + im[i][j][2]]*.000447 for j in range(l)] for i in range(l)]
-			inp_images.append(nim)
-		l = None
-		for f in files:
-			fname = div_hr + f
-			im = cv2.imread(fname)
-			if not l:
-				l = len(im)
-			nim = [[[im[i][j][0]*.001172 + im[i][j][1]*.002302 + im[i][j][2]]*.000447 for j in range(l)] for i in range(l)]
-			out_images.append(nim)
-		
-		print('preprocessed images')
-		inp_images,out_images = inp_images[:limit],out_images[:limit]
-		return (inp_images,out_images)	
-
-
+	
 	def format(self,inp_images,out_images,valid_in,valid_out):
 		inp_images = np.array(inp_images)
 		valid_in = np.array(valid_in)
@@ -67,19 +42,12 @@ class mat_file():
 		if len(inp_images) == 1:
 			y_train = np.reshape(out_images, (len(out_images), len(out_images[0]), len(out_images[0]),out_channels))
 			return inp_images,None,y_train,None
-
-		#out_images = np.reshape(out_images, (len(out_images), len(out_images[0]), len(out_images[0]),out_channels))
 		X_train, X_test, y_train, y_test = train_test_split(inp_images, out_images, test_size=0.10)
 		return X_train, X_test, y_train, y_test
 
 	def get_images(self):
-		if div_dataset:
-			data = self.get_div_images()
-			return data
 		inp_images,out_images = [],[]
 		for i in tqdm(range(1,self.limit+1,1)):
-			#if i == 436:
-		#		continue
 			ni = 6 - len(str(i))
 			ni = ''.join(['0']*ni) + str(i)
 			inp_file = self.inp_fname + ni + '.mat'
@@ -91,26 +59,27 @@ class mat_file():
 					imgs = []
 					if is_3d:
 						for k in range(size_3rd_dim):
-							imgs.append(inp_img[:,:,k,i,j])
+							three_stack = inp_img[:,:,k,i,j]/np.max(inp_img[:,:,k,i,j]) 
+							imgs.append(three_stack)
 					else:
-						imgs = inp_img[:,:,0,i,j]
+						twoDim = inp_img[:,:,0,i,j]/np.max(inp_img[:,:,0,i,j])
+						imgs = twoDim
 
-					if normalize:
-						imgs = imgs/np.max(imgs)
+					#if normalize:
+					#	imgs = (imgs/np.max(imgs))
 					inp_set.append(imgs)
 			out_img = loadmat(out_file)['crop_g']
 			s = out_img.shape
 			if len(s) == 3:
-				#out_img = np.swapaxes(out_img,0,2)
 				out_img = out_img.transpose((2, 0, 1))
 			imgs = []
 			if is_3d:
 				for k in range(size_3rd_dim):
-					imgs.append(out_img[k])
+					imgs.append(out_img[k]/np.max(out_img[k]))
 			else:
-				imgs = out_img			
-			if normalize:
-				imgs = imgs/np.max(imgs)
+				imgs = out_img/np.max(out_img)			
+			#if normalize:
+			#	imgs = imgs/np.max(imgs)
 			out_images.append([imgs])
 			inp_images.append(inp_set)
 		inp_images,out_images = np.array(inp_images),np.array(out_images)
@@ -119,18 +88,13 @@ class mat_file():
 		data = (inp_images,out_images)
 		return data
 	def save(self,out_images):
-		print("Hey1", out_images.shape)
+		print("Out-Images Shape", out_images.shape)
 		for i in range(3):
 			ofile2 = str(i) + '.png'
 			plt.figure(figsize=(8, 3.5))
 			plt.imshow(out_images[i])
 			plt.savefig(ofile2)
 	def get_data(self):
-		#if not is_3d:
-		#	pfile = pickle_loc + '0.p'	#1
-		#	if os.path.exists(pfile):	#1
-		#		data = self.load()		#1
-		#		return data				#1
 		data = self.get_images()
 		self.store(data)
 		return data
@@ -140,11 +104,10 @@ class mat_file():
 		for f in files:
 			f = pickle_loc + f
 			d = pickle.load(open(f, "rb" ))
-			x += d[0]#.tolist()
-			y += d[1]#.tolist()
+			x += d[0]
+			y += d[1]
 		x,y = np.array(x),np.array(y)
-		print('HERE')
-		print("Hey2",x.shape,y.shape)
+		print("Data_Load",x.shape,y.shape)
 		return x,y
 
 	def store(self,data):
@@ -159,7 +122,7 @@ class mat_file():
 
 	def get_2d_converted_data(self,inp_images,out_images):
 		si,so = inp_images.shape,out_images.shape
-		print("Hey3",si,so)
+		print("Converted 2D Shape",si,so)
 		inp_images = np.reshape(inp_images,(si[0],si[1]*si[2],si[3],si[4]))
 		out_images = np.reshape(out_images,(so[0],so[1]*so[2],so[3],so[4]))
 		return (inp_images,out_images)

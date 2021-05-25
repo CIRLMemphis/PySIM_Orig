@@ -1,9 +1,7 @@
 # sub-parts of the U-Net model
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 
 class double_conv(nn.Module):
     '''(conv => BN => ReLU) * 2'''

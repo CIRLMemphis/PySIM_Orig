@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import math
 from skimage.metrics import structural_similarity
+from config import *
 
 def get_errors(gt,pr, data_range = None):
     mse = np.mean((gt - pr) ** 2)
@@ -40,10 +41,8 @@ def get_metrics_vol (gt,pred):
     return metrics
 
 ######## Main Code ##########
-Nthe = 3
-Nphi = 5
-gt_file = "D:/NNData/3D/FairSIM3D_042221/Analysis/U2Os_Actin_5-7-Truth.mat"
-pred_file = "D:/PySIM/scunet_3d/U2Os_Actin_5-7-3x1-3D.mat"
+gt_file = "D:/NNData/NNData_0626/Analysis/Ground_Truth/Truth_U2Os_Actin_3-5-3x5.mat"
+pred_file = "D:/PySIM/scunet_3d/3D Results/U2Os_Actin_5-7-3x5.mat"
 gt = loadmat(gt_file)['reconOb']
 gt = gt / np.max(gt)
 #gt = (255* gt).astype(np.uint32)
