@@ -30,7 +30,7 @@ if is_3d:
     convert_to_2d = True
     in_out_same_size = False
     x_channel = 208
-    if train_model and not test_model:
+    if train_model and not test_model: #to avoid errord
         valid_in = 'D:/NNData/3D/FairSIM3D_042221/validation/in/in3DFairSIM'
         valid_out = 'D:/NNData/3D/FairSIM3D_042221/validation/out/out3DFairSIM'
         model_loc = 'D:/NNData/3D/FairSIM3D_042221/model/'
