@@ -69,16 +69,24 @@ def save_pred(model, data):
         pred_3_min.append(np.min(pred_three))
         pred_3_max.append(np.max(pred_three))
         pred_norm = []
+        pred_norm = []
         for i in range (size_3rd_dim):
             pred_i = pred[:,:,i]/np.max(pred[:,:,i])
             pred_norm_min.append(np.min(pred_i))
             pred_norm_max.append(np.max(pred_i))
             pred_norm.append(pred_i)
+           
+        #print(len(pred_norm))   
         pred_norm_arr = np.array(pred_norm)
         pred_norm_arr = pred_norm_arr.transpose((1, 2, 0))
-        pred_heads = ['Pred-Min', 'Pred-Max','Pred-Img-Norm-Min', 'Pred-Img-Norm-Max','Pred-3Img-Norm-Min', 'Pred-3Img-Norm-Max']
-        pred_data = pd.DataFrame(list(zip(pred_min, pred_max,pred_norm_min, pred_norm_max,pred_3_min,pred_3_max )), columns=pred_heads)
-        pred_data.to_csv('TestLog'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
+        print(pred_norm_arr.shape)
+        
+        pred_heads_1 = ['Pred-Min', 'Pred-Max','Pred-3Img-Norm-Min', 'Pred-3Img-Norm-Max']
+        pred_heads_2 = ['Pred-Img-Norm-Min', 'Pred-Img-Norm-Max']
+        pred_data1 = pd.DataFrame(list(zip(pred_min, pred_max,pred_3_min,pred_3_max )), columns=pred_heads_1)
+        pred_data2 = pd.DataFrame(list(zip(pred_norm_min, pred_norm_max, )), columns=pred_heads_2)
+        pred_data1.to_csv('PredTotalNorm'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
+        pred_data2.to_csv('PredPerPicNorm'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
         savemat(file_path, {'crop_g': pred_norm_arr})
 
 if __name__ == '__main__':
