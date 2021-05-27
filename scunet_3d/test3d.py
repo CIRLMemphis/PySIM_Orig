@@ -55,7 +55,6 @@ def save_pred(model, data):
     pred_max = []
     pred_3_min =[]
     pred_3_max =[]
-    pred_norm = []
     pred_norm_min = []
     pred_norm_max = []
     for image, file_path in data:
@@ -69,6 +68,7 @@ def save_pred(model, data):
         pred_three = pred/np.max(pred)
         pred_3_min.append(np.min(pred_three))
         pred_3_max.append(np.max(pred_three))
+        pred_norm = []
         for i in range (size_3rd_dim):
             pred_i = pred[:,:,i]/np.max(pred[:,:,i])
             pred_norm_min.append(np.min(pred_i))
