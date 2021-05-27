@@ -24,7 +24,6 @@ class mat_file():
 		self.inp_fname = valid_in
 		self.out_fname = valid_out
 		self.limit = valid_limit
-
 	
 	def format(self,inp_images,out_images,valid_in,valid_out):
 		inp_images = np.array(inp_images)
@@ -62,11 +61,7 @@ class mat_file():
 							three_stack = inp_img[:,:,k,i,j]/np.max(inp_img[:,:,k,i,j]) 
 							imgs.append(three_stack)
 					else:
-						twoDim = inp_img[:,:,0,i,j]/np.max(inp_img[:,:,0,i,j])
-						imgs = twoDim
-
-					#if normalize:
-					#	imgs = (imgs/np.max(imgs))
+						imgs = inp_img[:,:,0,i,j]/np.max(inp_img[:,:,0,i,j])
 					inp_set.append(imgs)
 			out_img = loadmat(out_file)['crop_g']
 			s = out_img.shape
@@ -78,8 +73,6 @@ class mat_file():
 					imgs.append(out_img[k]/np.max(out_img[k]))
 			else:
 				imgs = out_img/np.max(out_img)			
-			#if normalize:
-			#	imgs = imgs/np.max(imgs)
 			out_images.append([imgs])
 			inp_images.append(inp_set)
 		inp_images,out_images = np.array(inp_images),np.array(out_images)

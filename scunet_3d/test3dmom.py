@@ -28,24 +28,20 @@ def get_images():
             for j in range(Nphi):
                 imgs = []
                 for k in range(size_3rd_dim):
-                    init = inp_img[:,:,k,i,j]
-                    min_rang_before.append(np.min(init))
-                    max_rang_before.append(np.max(init))
-                    #print('Range of Values Before',np.min(inp_img[:,:,k,i,j]),np.max(inp_img[:,:,k,i,j]))
-                    three_stack = inp_img[:,:,k,i,j]/np.max(inp_img[:,:,k,i,j])
-                    min_rang_after.append(np.min(three_stack))
-                    max_rang_after.append(np.max(three_stack))
-                    #print('Range of Values After',np.min(three_stack),np.max(three_stack))
-                    #three_stack.shape
+                    three_stack = inp_img[:,:,k,i,j]
+                    min_rang_before.append(np.min(three_stack))
+                    max_rang_before.append(np.max(three_stack))
                     imgs.append(three_stack)
                 #print(len(imgs))
                 # imgs holds 3 pictures per crop
                 #if normalize:
-                #    imgs = imgs/np.max(imgs)
+                imgs = imgs/np.max(imgs)
+                min_rang_after.append(np.min(imgs))
+                max_rang_after.append(np.max(imgs))
                 inp_set.append(imgs)
             col_heads = ['Before-Min', 'Before-Max', 'After-Min', 'After-Max']
             norm = pd.DataFrame(list(zip(min_rang_before, max_rang_before,min_rang_after, max_rang_after, )), columns=col_heads)
-            norm.to_csv('TrainData-DataLoad_Norm'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
+            norm.to_csv('MomTrain-DataLoad_Norm'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
         inp_set = np.array(inp_set)
         inp_set = np.expand_dims(inp_set, axis=0)
         if convert_to_2d:
@@ -75,7 +71,7 @@ def save_pred(model, data):
         pred_max_norm.append(np.max(pred_norm))
         pred_heads = ['Pred-Min', 'Pred-Max','PredNorm-Min', 'PredNorm-Max']
         pred_norm = pd.DataFrame(list(zip(pred_min, pred_max,pred_min_norm, pred_max_norm)), columns=pred_heads)
-        pred_norm.to_csv('TrainData-Predictions_Norm_Check'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
+        pred_norm.to_csv('MomTrainData-Predictions_Norm'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
         savemat(file_path, {'crop_g': pred})
 
 if __name__ == '__main__':
@@ -83,7 +79,7 @@ if __name__ == '__main__':
     model = UNet(n_channels=(Nthe*Nphi*3), n_classes=3)
     print("{} Parameters in total".format(sum(x.numel() for x in model.parameters())))
     model.cuda(cuda)
-    model.load_state_dict(torch.load(model_loc+"Model_Final_550_3_5.pkl"))
+    model.load_state_dict(torch.load(model_loc+"Model_Final_2500_3_5.pkl"))
     model.eval()
     model.cuda(cuda)
     data = get_images()
