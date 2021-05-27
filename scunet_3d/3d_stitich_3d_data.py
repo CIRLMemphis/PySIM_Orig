@@ -39,7 +39,7 @@ def visualize_save_stitched_img(img):
         plt.title("stitched_image" + str(i))
         plt.savefig("stitched_{}.jpg".format(i))
 
-def matsave_stitched_img(stitched_img, key_name='crop_g', out_filepath='D:/PySIM/scunet_3d/3D Results/U2Os_Actin_5-7-3x5.mat'):
+def matsave_stitched_img(stitched_img, key_name='crop_g', out_filepath='D:/PySIM/scunet_3d/U2Os_Actin_5-7-3x5.mat'):
     out_dict = {key_name:stitched_img}
     savemat(out_filepath, out_dict)
 
