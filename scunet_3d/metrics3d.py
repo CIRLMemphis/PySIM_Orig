@@ -40,24 +40,40 @@ def get_metrics_vol (gt,pred):
     metrics = {k: v/1 for k,v in metrics.items()}
     return metrics
 
+def threed_norm (data):
+    pred_norm = []
+    for i in range (size_3rd_dim):
+        data_i = data[:,:,i]
+        pred_i = data[:,:,i]/np.max(data[:,:,i])
+        #pred_i[pred_i<0] = 0
+        print('RangeBefore:',np.min(data_i),np.max(data_i))
+        print('Range:',np.min(pred_i),np.max(pred_i))
+        pred_norm.append(pred_i)
+        
+    #print(len(pred_norm))   
+    pred_norm_arr = np.array(pred_norm)
+    pred_norm_arr = pred_norm_arr.transpose((1, 2, 0))
+    pred_norm_arr = (pred_norm_arr).astype(np.double)
+    print(pred_norm_arr.shape)
+    return pred_norm_arr
+
+
 ######## Main Code ##########
-gt_file = "D:/NNData/NNData_0626/Analysis/Ground_Truth/Truth_U2Os_Actin_3-5-3x5.mat"
-pred_file = "D:/PySIM/scunet_3d/3D Results/U2Os_Actin_5-7-3x5.mat"
+gt_file = "D:/NNData/Metrics/Three_GT.mat"
+pred_file = "D:/PySIM/scunet_3d/U2Os_Actin_5-7-3x1.mat"
 gt = loadmat(gt_file)['reconOb']
-gt = gt / np.max(gt)
-#gt = (255* gt).astype(np.uint32)
-print("GroundTruth",gt.dtype, gt.shape)
+gt_norm = threed_norm(gt)
+print('GT-norm',gt_norm.shape,np.min(gt_norm),np.max(gt_norm))
 pred = loadmat(pred_file)['crop_g']
-pred = pred / np.max(pred)
-#pred = (255* pred).astype(np.uint32)
-print("Predictions",pred.dtype,pred.shape)
-#exit()
+pred_norm = threed_norm(pred)
+print('Pred-norm',pred_norm.shape,np.min(pred_norm),np.max(pred_norm))
+
 val_metrics =  {'mse1':[], 'ssim1':[], 'psnr1':[],
                 'mse2':[], 'ssim2':[], 'psnr2':[],
                 'mse3':[], 'ssim3':[], 'psnr3':[]}
-volmetrics = get_errors (gt,pred)
+volmetrics = get_errors (gt_norm,pred_norm)
 print('Metrics For 3D Volume',volmetrics)
-metrics = get_metrics_vol(gt,pred)
+metrics = get_metrics_vol(gt_norm,pred_norm)
 for k in metrics.keys():
     val_metrics[k].append(metrics[k])
 col_heads = ['MSE-1', 'SSIM-1', 'PSNR-1', 'MSE-2', 'SSIM-2', 'PSNR-2', 'MSE-3', 'SSIM-3', 'PSNR-3']

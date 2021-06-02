@@ -43,7 +43,7 @@ def get_images():
         inp_set = np.expand_dims(inp_set, axis=0)
         if convert_to_2d:
             inp_set = get_2d_converted_data(inp_set)
-        inp_set = torch.from_numpy(inp_set).float()
+        inp_set = torch.from_numpy(inp_set.astype('double')).double()
         file_name = os.path.basename(inp_file)
         out_file = os.path.join(out_dir, file_name)
         data.append((inp_set, out_file))
@@ -60,15 +60,14 @@ def save_pred(model, data):
     for image, file_path in data:
         img = image.cuda(cuda)
         pred = model(img)        
-        pred = pred.detach().cpu().numpy()[0]
-        pred = (pred).astype(np.double)
+        pred = pred.detach().cpu().numpy().astype(np.double)[0]
+        #print(pred.shape,pred.dtype)
         pred = pred.transpose((1, 2, 0))
         pred_min.append(np.min(pred))
         pred_max.append(np.max(pred))
         pred_three = pred/np.max(pred)
         pred_3_min.append(np.min(pred_three))
         pred_3_max.append(np.max(pred_three))
-        pred_norm = []
         pred_norm = []
         for i in range (size_3rd_dim):
             pred_i = pred[:,:,i]/np.max(pred[:,:,i])
@@ -79,7 +78,8 @@ def save_pred(model, data):
         #print(len(pred_norm))   
         pred_norm_arr = np.array(pred_norm)
         pred_norm_arr = pred_norm_arr.transpose((1, 2, 0))
-        print(pred_norm_arr.shape)
+        pred_norm_arr = (255*pred_norm_arr).astype(np.double)
+        #print(pred_norm_arr.shape)
         
         pred_heads_1 = ['Pred-Min', 'Pred-Max','Pred-3Img-Norm-Min', 'Pred-3Img-Norm-Max']
         pred_heads_2 = ['Pred-Img-Norm-Min', 'Pred-Img-Norm-Max']
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     model = UNet(n_channels=(Nthe*Nphi*3), n_classes=3)
     print("{} Parameters in total".format(sum(x.numel() for x in model.parameters())))
     model.cuda(cuda)
-    model.load_state_dict(torch.load(model_loc+"Model_Final_550_3_5.pkl"))
+    model.load_state_dict(torch.load(model_loc+"Model_Final_550_3_1.pkl"))
     model.eval()
     model.cuda(cuda)
     data = get_images()

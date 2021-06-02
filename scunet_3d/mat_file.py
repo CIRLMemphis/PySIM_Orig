@@ -80,6 +80,7 @@ class mat_file():
 			inp_images,out_images = self.get_2d_converted_data(inp_images,out_images)
 		data = (inp_images,out_images)
 		return data
+		
 	def save(self,out_images):
 		print("Out-Images Shape", out_images.shape)
 		for i in range(3):

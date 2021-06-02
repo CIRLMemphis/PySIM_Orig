@@ -41,14 +41,20 @@ def get_metrics_vol (gt,pred):
     return metrics
 
 ######## Main Code ##########
-
-gt_file = "D:/NNData/NNData_0626/Analysis/Ground_Truth/Truth_U2Os_Actin_3-5-3x5.mat"
+gt_file = "D:/NNData/Metrics/Two_GT.mat"
 pred_file = "D:/NNData/NNData_0626/Analysis/Predicted_Stitch/2D_U2Os_Actin_3x1.mat"
 gt = loadmat(gt_file)['reconOb']
 print("min,load,gt",np.max(gt))
 gt = gt / np.max(gt)
+#print("GroundTruth",gt.dtype, gt.shape)
+#print("min,norm,gt",np.max(gt),gt.dtype)
 pred = loadmat(pred_file)['crop_g']
+#print("min,load,pred",np.max(pred))
 pred = pred / np.max(pred)
+#print("GroundTruth",pred.dtype, pred.shape)
+#print("min,norm,pred",np.max(pred),pred.dtype)
+#exit ()
+#pred = (255* pred).astype(np.uint32)
 val_metrics =  {'mse1':[], 'ssim1':[], 'psnr1':[],
                 'mse2':[], 'ssim2':[], 'psnr2':[],
                 'mse3':[], 'ssim3':[], 'psnr3':[]}

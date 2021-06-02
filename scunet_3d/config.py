@@ -8,7 +8,7 @@ is_3d = True
 train_model = False
 test_model = True
 data_reduced = False
-limit =169
+from glob import glob 
 Nthe = 3                                                         
 Nphi = 5                                                         
 pickle_n = 5                                                     
@@ -21,10 +21,11 @@ save_mat = False
 single_unet = False                                              
 
 ## Set train params
-save_model_per_epoch = False
-save_model_per_interval = True
-interval = 50
-load_model = False      
+if train_model:
+    save_model_per_epoch = False
+    save_model_per_interval = True
+    interval = 100
+    load_model = False
 
 if is_3d:
     convert_to_2d = True
@@ -38,7 +39,7 @@ if is_3d:
         out_dir = 'D:/NNData/3D/FairSIM3D_042221/pred/'                
         inp_fname = 'D:/NNData/3D/FairSIM3D_042221/in/in3DFairSIM'
         out_fname = 'D:/NNData/3D/FairSIM3D_042221/out/out3DFairSIM'
-        model_file = "D:/NNData/3D/FairSIM3D_042221/model/650.pt"
+        model_file = "D:/NNData/3D/FairSIM3D_042221/model/550.pt"
 
     if test_model and not train_model:
             model_loc = 'D:/NNData/3D/FairSIM3D_042221/model/'  
@@ -64,3 +65,8 @@ if not is_3d:
        out_dir = 'D:/NNData/NNData_0626/test_result/' #output directory
        inp_fname ='D:/NNData/NNData_0626/test_valid/in/inFairSIM'
        model_loc = 'D:/NNData/NNData_0626/model/'
+
+mat_files = glob(inp_fname + '*')
+mat_files = sorted(mat_files)
+limit = len(mat_files)
+print("Total {} .mat input files for ops".format(len(mat_files)))
