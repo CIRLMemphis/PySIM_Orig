@@ -21,11 +21,10 @@ save_mat = False
 single_unet = False                                              
 
 ## Set train params
-if train_model:
-    save_model_per_epoch = False
-    save_model_per_interval = True
-    interval = 50
-    load_model = False      
+save_model_per_epoch = False
+save_model_per_interval = True
+interval = 50
+load_model = False      
 
 if is_3d:
     convert_to_2d = True
