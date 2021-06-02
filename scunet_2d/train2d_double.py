@@ -1,3 +1,4 @@
+## Script is useless really as torchtensors.double takes too long to train with does 10 epochs ~~ 2.5 hours
 from xlwt import *
 import numpy as np
 import os
