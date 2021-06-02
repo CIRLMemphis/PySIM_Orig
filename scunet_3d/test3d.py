@@ -31,10 +31,9 @@ def get_images():
                     init = inp_img[:,:,k,i,j]
                     min_rang_before.append(np.min(init))
                     max_rang_before.append(np.max(init))
-                    three_stack = inp_img[:,:,k,i,j]/np.max(inp_img[:,:,k,i,j])
-                    min_rang_after.append(np.min(three_stack))
-                    max_rang_after.append(np.max(three_stack))
-                    imgs.append(three_stack)
+                    imgs.append(init)
+                if normalize:
+                    imgs = imgs/(np.max(imgs))
                 inp_set.append(imgs)
             col_heads = ['Before-Min', 'Before-Max', 'After-Min', 'After-Max']
             norm = pd.DataFrame(list(zip(min_rang_before, max_rang_before,min_rang_after, max_rang_after, )), columns=col_heads)
