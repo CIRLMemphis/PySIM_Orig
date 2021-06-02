@@ -69,4 +69,4 @@ if not is_3d:
 mat_files = glob(inp_fname + '*')
 mat_files = sorted(mat_files)
 limit = len(mat_files)
-print("Total {} .mat input files for ops".format(len(mat_files)))
+print("Total {} .mat input files for Train/Test".format(len(mat_files)))
