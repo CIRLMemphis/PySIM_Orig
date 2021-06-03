@@ -58,10 +58,12 @@ class mat_file():
 					imgs = []
 					if is_3d:
 						for k in range(size_3rd_dim):
-							three_stack = inp_img[:,:,k,i,j]/np.max(inp_img[:,:,k,i,j]) 
-							imgs.append(three_stack)
+							imgs.append(inp_img[:,:,k,i,j])
 					else:
-						imgs = inp_img[:,:,0,i,j]/np.max(inp_img[:,:,0,i,j])
+						imgs = inp_img[:,:,0,i,j]
+
+					if normalize:
+						imgs = imgs/np.max(imgs)
 					inp_set.append(imgs)
 			out_img = loadmat(out_file)['crop_g']
 			s = out_img.shape
