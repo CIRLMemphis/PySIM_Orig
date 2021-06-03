@@ -106,7 +106,7 @@ train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size
 test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
 in_channels = X_train.shape[1] 
 out_channels = y_train.shape[1]
-model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1]) 
+model = UNet(n_channels=Nthe*Nphi, n_classes=1)
 print("{} Parameters in total".format(sum(x.numel() for x in model.parameters())))
 model.cuda(cuda)
 optimizer = torch.optim.Adam(model.parameters(),lr=learning_rate,  betas=(0.9, 0.999))

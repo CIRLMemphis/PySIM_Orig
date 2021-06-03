@@ -4,9 +4,9 @@
 # (c) Set Number of input images (Nthe,Nphi) 
 # (d) Set limit -No of images to test or train
 
-is_3d = True
-train_model = False
-test_model = True
+is_3d = False
+train_model = True
+test_model = False
 data_reduced = False
 from glob import glob 
 Nthe = 3                                                         
