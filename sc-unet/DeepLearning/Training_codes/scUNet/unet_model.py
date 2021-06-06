@@ -28,7 +28,7 @@ class UNet(nn.Module):
         self.up22 = up(x*8, x*4)
         self.up32 = up(x*4, x*2)
         self.up42 = up(x*2, x)
-        self.unet_1st_out = outconv(x, n_channels)
+        self.unet_1st_out = outconv(x, n_channels) # This line is wrong
         if in_out_same_size:
             self.unet_2nd_out = outconv(x, n_classes)
         else:
