@@ -31,9 +31,6 @@ class UNet(nn.Module):
         self.up22 = up(x*8, x*4)
         self.up32 = up(x*4, x*2)
         self.up42 = up(x*2, x)
-        if is_3d and not in_out_same_size:
-            self.unet_1st_out = outconv(x, n_channels)
-        
         if in_out_same_size:
             self.unet_2nd_out = outconv(x, n_classes)
         else:            
@@ -43,21 +40,33 @@ class UNet(nn.Module):
     def forward(self, x):
         x_in = x
         x1 = self.inc(x)
-        
+        print('x1',x1.shape)
         x2 = self.down11(x1)
+        print('x2',x2.shape)
         x3 = self.down21(x2)
+        print('x3',x3.shape)
         x4 = self.down31(x3)
+        print('x4',x4.shape)
         x5 = self.down41(x4)
+        print('x5',x5.shape)
 
         x = self.up11(x5, x4)
+        print('xup1',x.shape)
         x = self.up21(x4, x3)
+        print('xup2',x.shape)
         x = self.up31(x, x2)
+        print('xup3',x.shape)
         x = self.up41(x, x1)
+        print('xup4',x.shape)
         
         x = self.unet_1st_out(x)
+        print('x_out',x.shape)
         x = torch.cat([x_in, x], dim=1)
+        print('x_torch',x.shape)
+        
         x1 = self.inc0(x)
-     
+        print('x_1_two',x1.shape)
+        exit()
         x2 = self.down12(x1)
         x3 = self.down22(x2)
         x4 = self.down32(x3)
@@ -71,5 +80,4 @@ class UNet(nn.Module):
         if not in_out_same_size:
             x = self.up52(x, x1)
         x = self.unet_2nd_out(x)
-     
         return x

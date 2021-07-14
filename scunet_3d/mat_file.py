@@ -41,7 +41,7 @@ class mat_file():
 		if len(inp_images) == 1:
 			y_train = np.reshape(out_images, (len(out_images), len(out_images[0]), len(out_images[0]),out_channels))
 			return inp_images,None,y_train,None
-		X_train, X_test, y_train, y_test = train_test_split(inp_images, out_images, test_size=0.10)
+		X_train, X_test, y_train, y_test = train_test_split(inp_images, out_images, test_size=0.09)
 		return X_train, X_test, y_train, y_test
 
 	def get_images(self):
@@ -61,20 +61,24 @@ class mat_file():
 							imgs.append(inp_img[:,:,k,i,j])
 					else:
 						imgs = inp_img[:,:,0,i,j]
-
 					if normalize:
-						imgs = imgs/np.max(imgs)
+						imgs = (imgs - np.min(imgs))/(np.max(imgs) - np.min(imgs))
+						#imgs = (imgs - np.mean(imgs))/(np.std(imgs))
 					inp_set.append(imgs)
 			out_img = loadmat(out_file)['crop_g']
 			s = out_img.shape
 			if len(s) == 3:
 				out_img = out_img.transpose((2, 0, 1))
 			imgs = []
+			imgs = []
 			if is_3d:
 				for k in range(size_3rd_dim):
-					imgs.append(out_img[k]/np.max(out_img[k]))
+					imgs.append(out_img[k])
 			else:
-				imgs = out_img/np.max(out_img)			
+				imgs = out_img			
+			if normalize:
+				imgs = (imgs - np.min(imgs))/(np.max(imgs) - np.min(imgs))
+				#imgs = (imgs - np.mean(imgs))/(np.std(imgs))
 			out_images.append([imgs])
 			inp_images.append(inp_set)
 		inp_images,out_images = np.array(inp_images),np.array(out_images)
@@ -90,10 +94,12 @@ class mat_file():
 			plt.figure(figsize=(8, 3.5))
 			plt.imshow(out_images[i])
 			plt.savefig(ofile2)
+
 	def get_data(self):
 		data = self.get_images()
 		self.store(data)
 		return data
+	
 	def load(self):
 		files = os.listdir(pickle_loc)
 		x,y = [],[]

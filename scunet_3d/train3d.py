@@ -59,12 +59,10 @@ def save_pred(epoch,model,test_dataloader):
     for batch_idx, items in enumerate(test_dataloader):
         gt = items[1]
         img = items[0]
-        if torch.cuda.is_available():
-            img = img.cuda(cuda)
+        img = img.cuda(cuda)
         pred = model(img)
-        if torch.cuda.is_available():
-            pred = pred.cuda(cuda)
-            gt = gt.cuda(cuda)
+        pred = pred.cuda(cuda)
+        gt = gt.cuda(cuda)
         loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
         pred = pred.detach().cpu().numpy()
         gt = gt.detach().cpu().numpy()
@@ -97,7 +95,7 @@ def save_checkpoint(state,epoch):
 
 cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 have_cuda = True if torch.cuda.is_available() else False
-batch_size = 10
+batch_size = 40
 X_train,X_test,y_train,y_test = None,None,None,None
 mf = mat_file()
 inp_images,out_images = mf.get_data()
@@ -115,7 +113,7 @@ test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, 
 
 if is_3d and not (convert_to_2d, data_reduced): # 3D Processing directly
     model = UNet3D(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
-if data_reduced and single_unet: # 3D Converted to 2D with data reduction of reduced_size
+if single_unet:
     model = UNet3SIM(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
 else:
     model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
@@ -138,7 +136,7 @@ c = 0
 val_metrics =  {'loss':[], 'mse1':[], 'ssim1':[], 'psnr1':[],
                 'mse2':[], 'ssim2':[],'psnr2':[],
                 'mse3':[], 'ssim3':[],'psnr3':[]}
-epochs = 3000
+epochs = 1500
 
 for epoch in range(start_epoch, epochs):
     lr = .001 - (epoch/30000)
@@ -149,10 +147,10 @@ for epoch in range(start_epoch, epochs):
         image = items[0]
         gt = items[1]
         model.train()
+        #image = image.float
         gt = gt.float()
-        if have_cuda:
-            image = image.cuda(cuda)
-            gt = gt.cuda(cuda)
+        image = image.cuda(cuda)
+        gt = gt.cuda(cuda)
         pred = model(image)
         loss = (pred-gt).abs().mean() + 5 * ((pred-gt)**2).mean()
         optimizer.zero_grad()
@@ -173,23 +171,23 @@ for epoch in range(start_epoch, epochs):
                         val_metrics['mse2'], val_metrics['ssim2'], val_metrics['psnr2'],
                         val_metrics['mse3'], val_metrics['ssim3'], val_metrics['psnr3'],
                         learn_rate)), columns=col_heads)
-    metrics_assess.to_csv('metrics_3d'+'_'+str(Nthe)+'_'+str(Nphi)+'.csv')
+    metrics_assess.to_csv('metrics_3d'+'_'+str(Nthe)+'_'+str(Nphi)+'_validation.csv')
     if save_model_per_epoch:
         torch.save(model.state_dict(), model_loc+str(epoch+1)+".pkl")        
     if save_model_per_interval:
         if epoch % interval == 0:
             print('=> Saving Checkpoint')
             torch.save(model.state_dict(), model_loc+'Model_Final'+'_'+str(epoch)+'_'+str(Nthe)+'_'+str(Nphi)+".pkl")
-            torch.save({'epoch': epoch,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': tra_loss,
-                        'learn_rate': lr},    
-            model_loc+str(epoch)+".pt")
-torch.save(model.state_dict(), model_loc+'Model_Final'+'_'+str(epoch)+'_'+str(Nthe)+'_'+str(Nphi)+".pkl")
-torch.save({'epoch': epoch,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': tra_loss,
-                        'learn_rate': lr},    
-            model_loc+str(epoch)+".pt")
+#             torch.save({'epoch': epoch,
+#                         'model_state_dict': model.state_dict(),
+#                         'optimizer_state_dict': optimizer.state_dict(),
+#                         'loss': tra_loss,
+#                         'learn_rate': lr},    
+#             model_loc+str(epoch)+".pt")
+# torch.save(model.state_dict(), model_loc+'Model_Final'+'_'+str(epoch)+'_'+str(Nthe)+'_'+str(Nphi)+".pkl")
+# torch.save({'epoch': epoch,
+#                         'model_state_dict': model.state_dict(),
+#                         'optimizer_state_dict': optimizer.state_dict(),
+#                         'loss': tra_loss,
+#                         'learn_rate': lr},    
+#             model_loc+str(epoch)+".pt")

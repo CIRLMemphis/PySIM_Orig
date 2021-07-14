@@ -2,10 +2,11 @@ import numpy as np
 from glob import glob 
 from scipy.io import loadmat, savemat
 import matplotlib.pyplot as plt 
+from config import *
 
 def read_mat_files(mat_folderpath):
     mat_filepaths = glob(mat_folderpath + '*')
-    #mat_filepaths = sorted(mat_filepaths)
+    mat_filepaths = sorted(mat_filepaths)
     print("Total {} .mat files found".format(len(mat_filepaths)))
     img_crops_list = []
     for filepath in mat_filepaths :
@@ -21,8 +22,8 @@ def get_summed_img_mask(crop_imgs_reshaped, step_h, step_w):
     img_summed_h = crop_h + (num_crops_h-1)*step_h
     img_summed_w = crop_w + (num_crops_w-1)*step_w
     img_summed_c = crop_c
-    img_summed = np.zeros( (img_summed_h , img_summed_w, img_summed_c) , dtype='double')
-    mask = np.zeros( (img_summed_h , img_summed_w, img_summed_c) , dtype='double')
+    img_summed = np.zeros( (img_summed_h , img_summed_w, img_summed_c) , dtype='float')
+    mask = np.zeros( (img_summed_h , img_summed_w, img_summed_c) , dtype='float')
     for idx_h in range(num_crops_h):
         for idx_w in range(num_crops_w):
             offset_h = idx_h*step_h
@@ -39,11 +40,11 @@ def visualize_save_stitched_img(img):
         plt.title("stitched_image" + str(i))
         plt.savefig("stitched_{}.jpg".format(i))
 
-def matsave_stitched_img(stitched_img, key_name='crop_g', out_filepath='D:/PySIM/scunet_3d/U2Os_Actin_5-7-3x1.mat'):
+def matsave_stitched_img(stitched_img, key_name='crop_g', out_filepath='D:/PySIM/scunet_3d/U2Os_Actin_5-7-zscore'+str(Nthe)+'x'+str(Nphi)+'.mat'):
     out_dict = {key_name:stitched_img}
     savemat(out_filepath, out_dict)
 
-mat_folderpath = "D:/NNData/3D/FairSIM3D_042221/test_result/" 
+mat_folderpath = "D:/NNData/DV_Data/FairSIM3D_042221/test_result/" 
 crop_imgs      = read_mat_files(mat_folderpath) 
 print("Shape of img_crops_arr is {}. Dtype is {}".format(crop_imgs.shape, crop_imgs.dtype))
 num_crops, crop_h, crop_w, crop_c = crop_imgs.shape
@@ -63,7 +64,7 @@ stitched_img = img_summed * mask_inv
 print("Range of values in stitched_img before rounding and before typecasting: {}-{}".format(np.min(stitched_img), np.max(stitched_img)))
 print("Shape of stitched image: {}".format(stitched_img.shape))
 stitched_img = np.round(stitched_img)
-stitched_img = stitched_img.astype('double')
+stitched_img = stitched_img.astype('float')
 visualize_save_stitched_img(stitched_img)
 matsave_stitched_img(stitched_img)
 plt.show()

@@ -115,7 +115,7 @@ valid_psnr = []
 train_loss = []
 valid_loss = []
 learn_rate = []
-epochs = 3000
+epochs = 1000
 for epoch in range(epochs):
     lr = 0.001 - (epoch/30000)
     if lr < 0.000001:
