@@ -74,3 +74,4 @@ stitched_img = np.squeeze(stitched_img)
 #visualize_save_stitched_img(stitched_img)
 matsave_stitched_img(stitched_img)
 plt.show()
+#need to update assert like Dr Van assert in crop function

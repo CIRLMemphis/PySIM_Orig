@@ -12,11 +12,10 @@ from tqdm import tqdm
 import sys
 import pandas as pd
 from skimage.metrics import structural_similarity
-#from unet_model import UNet
+from unet_model import UNet
 import sys
 from config import *
 import matplotlib.pyplot as plt
-from unet_3d import UNet3D
 plt.style.use('seaborn-whitegrid')
 plt.style.use('classic')
 plt.figure(figsize=(16, 7))
@@ -96,7 +95,7 @@ def save_checkpoint(state,epoch):
 
 cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 have_cuda = True if torch.cuda.is_available() else False
-batch_size = 35
+batch_size = 40
 X_train,X_test,y_train,y_test = None,None,None,None
 mf = mat_file()
 inp_images,out_images = mf.get_data()
@@ -112,8 +111,12 @@ test_data = ImageDataset(X_test,y_test)
 train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop  
 test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, pin_memory=False) # better than for loop
 
-if is_3d and not (convert_to_2d): # 3D Processing directly
+if is_3d and not (convert_to_2d, data_reduced): # 3D Processing directly
     model = UNet3D(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
+if single_unet:
+    model = UNet3SIM(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
+else:
+    model = UNet(n_channels=X_train.shape[1], n_classes=y_train.shape[1])
 
 start_epoch = 0
 if load_model:

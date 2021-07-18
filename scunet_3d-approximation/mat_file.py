@@ -59,24 +59,31 @@ class mat_file():
 					if is_3d:
 						for k in range(size_3rd_dim):
 							imgs.append(inp_img[:,:,k,i,j])
+					else:
+						imgs = inp_img[:,:,0,i,j]
+					if normalize:
 						imgs = (imgs - np.min(imgs))/(np.max(imgs) - np.min(imgs))
-						#print('loaded image',imgs.shape)
+						#imgs = (imgs - np.mean(imgs))/(np.std(imgs))
 					inp_set.append(imgs)
 			out_img = loadmat(out_file)['crop_g']
 			s = out_img.shape
 			if len(s) == 3:
 				out_img = out_img.transpose((2, 0, 1))
 			imgs = []
+			imgs = []
 			if is_3d:
 				for k in range(size_3rd_dim):
 					imgs.append(out_img[k])
+			else:
+				imgs = out_img			
 			if normalize:
 				imgs = (imgs - np.min(imgs))/(np.max(imgs) - np.min(imgs))
+				#imgs = (imgs - np.mean(imgs))/(np.std(imgs))
 			out_images.append([imgs])
 			inp_images.append(inp_set)
 		inp_images,out_images = np.array(inp_images),np.array(out_images)
-		print("inp images", inp_images.shape)		
-		print("gt img", out_images.shape)		
+		if convert_to_2d:
+			inp_images,out_images = self.get_2d_converted_data(inp_images,out_images)
 		data = (inp_images,out_images)
 		return data
 		
