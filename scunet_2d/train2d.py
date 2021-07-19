@@ -53,6 +53,9 @@ def save_pred(epoch,model,test_dataloader):
     for batch_idx, items in enumerate(test_dataloader):
         gt = items[1]
         img = items[0]
+        print ("GroundTruth",gt.shape)
+        print ("Data",image.shape)
+        exit()
         img = img.cuda(cuda)
         pred = model(img)
         pred = pred.cuda(cuda)
