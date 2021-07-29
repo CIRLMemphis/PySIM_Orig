@@ -35,6 +35,9 @@ for ind = 1:length(datasets)
         cnt = cnt + 1;
     end
     reconOb    = double(reconOb);
+    pause
+    % Save reconOb as Two GT and Three GT. Both are the same file, the ground truth.  
+    
     %imshow3D(reconOb); colormap jet;
     %size(reconOb)
     %pause
